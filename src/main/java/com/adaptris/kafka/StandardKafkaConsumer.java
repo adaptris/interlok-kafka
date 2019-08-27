@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.InvalidOffsetException;
@@ -79,7 +80,8 @@ public class StandardKafkaConsumer extends AdaptrisMessageConsumerImp implements
       List<String> topics = Arrays.asList(Args.notBlank(getDestination().getDestination(), "topics").split("\\s*,\\s*"));
       LoggingContext.LOGGER.logPartitions(this, topics, consumer);
       consumer.subscribe(topics);
-      ManagedThreadFactory.createThread("KafkaConsumer", new MessageConsumerRunnable()).start();
+      String threadName = StringUtils.defaultIfBlank(getDestination().getDeliveryThreadName(), "KafkaConsumer");
+      ManagedThreadFactory.createThread(threadName, new MessageConsumerRunnable()).start();
     } catch (RuntimeException e) {
       // ConfigException extends KafkaException which is a RTE
       throw ExceptionHelper.wrapCoreException(e);
