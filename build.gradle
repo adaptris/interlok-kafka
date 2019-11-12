@@ -107,7 +107,7 @@ dependencies {
   compile ("org.slf4j:slf4j-api:$slf4jVersion")
   compile ("org.apache.kafka:kafka-clients:$kafkaVersion")
   compile ("org.apache.kafka:kafka_2.11:$kafkaVersion")
-  compile ("com.fasterxml.jackson.core:jackson-databind:2.10.0")
+  compile ("com.fasterxml.jackson.core:jackson-databind:2.10.1")
 
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
   umlDoclet("nl.talsmasoftware:umldoclet:1.1.4")
