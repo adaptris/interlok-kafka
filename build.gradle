@@ -4,7 +4,7 @@ plugins {
   id 'maven'
   id 'maven-publish'
   id  "jacoco"
-  id 'com.github.spotbugs' version '2.0.0'
+  id 'com.github.spotbugs' version '3.0.0'
 }
 ext {
   interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.9-SNAPSHOT'
@@ -22,7 +22,7 @@ ext {
   componentName='Interlok/Apache Kafka'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.28'
+  slf4jVersion = '1.7.29'
   log4j2Version = '2.12.1'
   kafkaVersion = '1.1.1'
 }
@@ -43,6 +43,24 @@ if (JavaVersion.current().isJava8Compatible()) {
       options.addStringOption('Xdoclint:none', '-quiet')
     }
   }
+}
+ext.gitBranchNameOrTimestamp = { branchName ->
+  if (branchName.equals("HEAD") || branchName.equals("develop") || branchName.startsWith("release")) {
+    return new Date().format('HH:mm:ss z');
+  }
+  return branchName;
+}
+
+ext.buildInfo = { ->
+   new ByteArrayOutputStream().withStream { os ->
+      exec {
+        executable = "git"
+        args = ["rev-parse", "--abbrev-ref", "HEAD"]
+        standardOutput = os
+      }
+      def branchName = os.toString().replaceAll("\r", "").replaceAll("\n", "").trim();
+      return gitBranchNameOrTimestamp(branchName);
+    }
 }
 
 apply plugin: 'java'
@@ -89,7 +107,7 @@ dependencies {
   compile ("org.slf4j:slf4j-api:$slf4jVersion")
   compile ("org.apache.kafka:kafka-clients:$kafkaVersion")
   compile ("org.apache.kafka:kafka_2.11:$kafkaVersion")
-  compile ("com.fasterxml.jackson.core:jackson-databind:2.10.0")
+  compile ("com.fasterxml.jackson.core:jackson-databind:2.10.1")
 
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
   umlDoclet("nl.talsmasoftware:umldoclet:1.1.4")
@@ -135,6 +153,7 @@ task generateVersion {
       entry(key: 'artifactId', value: project.name)
       entry(key: 'build.version', value: releaseVersion)
       entry(key: 'build.date', value: new Date().format('yyyy-MM-dd'))
+      entry(key: 'build.info', value: buildInfo())
     }
   }
 }
@@ -166,10 +185,6 @@ javadoc {
     options.addStringOption "tagletpath", configurations.javadoc.asPath
     title= componentName
   }
-}
-
-jacoco {
-  toolVersion="0.8.3"
 }
 
 jacocoTestReport {
