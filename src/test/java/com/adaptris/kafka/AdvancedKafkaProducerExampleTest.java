@@ -3,7 +3,6 @@ package com.adaptris.kafka;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.adaptris.core.ConfiguredProduceDestination;
 import com.adaptris.core.ProducerCase;
 import com.adaptris.core.StandaloneProducer;
@@ -15,20 +14,11 @@ public class AdvancedKafkaProducerExampleTest extends ProducerCase {
 
   private static Logger log = LoggerFactory.getLogger(AdvancedKafkaProducerExampleTest.class);
 
-  public AdvancedKafkaProducerExampleTest(String name) {
-    super(name);
-  }
 
   @Override
-  public void setUp() throws Exception {
-    super.setUp();
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
-
-  @Override
-  public void tearDown() throws Exception {
-    super.tearDown();
-  }
-
   @Override
   protected String createBaseFileName(Object object) {
     return ((StandaloneProducer) object).getProducer().getClass().getName() + "-AdvancedProducerConfig";
