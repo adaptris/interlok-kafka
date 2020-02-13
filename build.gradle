@@ -24,7 +24,7 @@ ext {
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
   log4j2Version = '2.13.0'
-  kafkaVersion = '1.1.1'
+  kafkaVersion = '2.4.0'
 }
 
 ext.hasGraphViz = { ->
