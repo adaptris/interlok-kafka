@@ -6,11 +6,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
-
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -22,7 +20,6 @@ import org.junit.rules.TestName;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.BaseCase;
@@ -32,6 +29,7 @@ import com.adaptris.core.StandaloneConsumer;
 import com.adaptris.core.stubs.MockMessageListener;
 import com.adaptris.core.util.LifecycleHelper;
 
+@SuppressWarnings("deprecation")
 public class MockConsumerTest {
 
   private static Logger log = LoggerFactory.getLogger(MockConsumerTest.class);
@@ -72,6 +70,7 @@ public class MockConsumerTest {
     Mockito.when(records.count()).thenReturn(0);
     Mockito.when(records.iterator()).thenReturn(new ArrayList<ConsumerRecord<String, AdaptrisMessage>>().iterator());
     Mockito.when(kafkaConsumer.poll(Mockito.anyLong())).thenReturn(records);
+    Mockito.when(kafkaConsumer.poll(Mockito.anyObject())).thenReturn(records);
     StandaloneConsumer sc = new StandaloneConsumer(new KafkaConnection(new SimpleConfigBuilder("localhost:4242")), consumer);
     try {
       LifecycleHelper.initAndStart(sc);
@@ -96,6 +95,7 @@ public class MockConsumerTest {
     Mockito.when(records.count()).thenReturn(0);
     Mockito.when(records.iterator()).thenReturn(new ArrayList<ConsumerRecord<String, AdaptrisMessage>>().iterator());
     Mockito.when(kafkaConsumer.poll(Mockito.anyLong())).thenReturn(records);
+    Mockito.when(kafkaConsumer.poll(Mockito.anyObject())).thenReturn(records);
     StandaloneConsumer sc = new StandaloneConsumer(new KafkaConnection(new SimpleConfigBuilder("localhost:4242")), consumer);
     try {
       LifecycleHelper.initAndStart(sc);
@@ -128,6 +128,7 @@ public class MockConsumerTest {
     Mockito.when(records.iterator())
         .thenReturn(new ArrayList<ConsumerRecord<String, AdaptrisMessage>>(Arrays.asList(record)).iterator());
     Mockito.when(kafkaConsumer.poll(Mockito.anyLong())).thenReturn(records);
+    Mockito.when(kafkaConsumer.poll(Mockito.anyObject())).thenReturn(records);
     StandaloneConsumer sc = new StandaloneConsumer(new KafkaConnection(new SimpleConfigBuilder("localhost:4242")), consumer);
     MockMessageListener mock = new MockMessageListener();
     sc.registerAdaptrisMessageListener(mock);

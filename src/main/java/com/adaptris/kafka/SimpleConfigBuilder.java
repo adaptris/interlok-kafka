@@ -2,14 +2,11 @@ package com.adaptris.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.validation.constraints.Min;
-
+import javax.validation.constraints.NotBlank;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.hibernate.validator.constraints.NotBlank;
-
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.CoreException;
