@@ -2,11 +2,9 @@ package com.adaptris.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import javax.validation.constraints.NotBlank;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.hibernate.validator.constraints.NotBlank;
-
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.util.Args;

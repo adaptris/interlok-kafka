@@ -1,18 +1,16 @@
 package com.adaptris.kafka;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
-
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
@@ -117,7 +115,7 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
     int proc = 0;
     try {
       log.trace("Going to Poll with timeout {}", receiveTimeoutMs());
-      ConsumerRecords<String, AdaptrisMessage> records = consumer.poll(receiveTimeoutMs());
+      ConsumerRecords<String, AdaptrisMessage> records = consumer.poll(Duration.ofMillis(receiveTimeoutMs()));
       for (ConsumerRecord<String, AdaptrisMessage> record : records) {
         retrieveAdaptrisMessageListener().onAdaptrisMessage(record.value());
         proc++;
