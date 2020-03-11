@@ -109,7 +109,7 @@ dependencies {
   compile ("org.slf4j:slf4j-api:$slf4jVersion")
   compile ("org.apache.kafka:kafka-clients:$kafkaVersion")
   compile ("org.apache.kafka:kafka_2.11:$kafkaVersion")
-  compile ("com.fasterxml.jackson.core:jackson-databind:2.10.2")
+  compile ("com.fasterxml.jackson.core:jackson-databind:2.10.3")
   compile ("commons-collections:commons-collections:3.2.2")
 
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
