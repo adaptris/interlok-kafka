@@ -1,12 +1,12 @@
 package com.adaptris.kafka;
 
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.InvalidOffsetException;
@@ -14,7 +14,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.AuthorizationException;
 import org.apache.kafka.common.errors.WakeupException;
 import org.slf4j.Logger;
-
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
@@ -151,10 +150,11 @@ public class StandardKafkaConsumer extends AdaptrisMessageConsumerImp implements
   }
 
   private class MessageConsumerRunnable implements Runnable {
+    @Override
     public void run() {
       do {
         try {
-          ConsumerRecords<String, AdaptrisMessage> records = consumer.poll(receiveTimeoutMs());
+          ConsumerRecords<String, AdaptrisMessage> records = consumer.poll(Duration.ofMillis(receiveTimeoutMs()));
           for (ConsumerRecord<String, AdaptrisMessage> record : records) {
             retrieveAdaptrisMessageListener().onAdaptrisMessage(record.value());
           }

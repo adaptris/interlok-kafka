@@ -2,9 +2,10 @@ package com.adaptris.kafka;
 
 import java.util.Map;
 
+import javax.validation.constraints.NotBlank;
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.hibernate.validator.constraints.NotBlank;
 
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;

@@ -3,7 +3,6 @@ package com.adaptris.kafka;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.adaptris.core.ConfiguredConsumeDestination;
 import com.adaptris.core.ConsumerCase;
 import com.adaptris.core.StandaloneConsumer;
@@ -14,18 +13,10 @@ public class AdvancedKafkaConsumerExampleTest extends ConsumerCase {
 
   private static Logger log = LoggerFactory.getLogger(AdvancedKafkaConsumerExampleTest.class);
 
-  public AdvancedKafkaConsumerExampleTest(String name) {
-    super(name);
-  }
 
   @Override
-  public void setUp() throws Exception {
-    super.setUp();
-  }
-
-  @Override
-  public void tearDown() throws Exception {
-    super.tearDown();
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
 
   @Override

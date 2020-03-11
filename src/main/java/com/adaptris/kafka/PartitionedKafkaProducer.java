@@ -1,6 +1,6 @@
 package com.adaptris.kafka;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
 import com.adaptris.annotation.ComponentProfile;
