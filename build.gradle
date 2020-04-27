@@ -25,6 +25,7 @@ ext {
   slf4jVersion = '1.7.30'
   log4j2Version = '2.13.2'
   kafkaVersion = '2.4.1'
+  nettyVersion='4.1.49.Final'
 }
 
 ext.hasGraphViz = { ->
@@ -111,9 +112,19 @@ dependencies {
   compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
   compile ("org.slf4j:slf4j-api:$slf4jVersion")
   compile ("org.apache.kafka:kafka-clients:$kafkaVersion")
-  compile ("org.apache.kafka:kafka_2.11:$kafkaVersion")
+  compile ("org.apache.kafka:kafka_2.11:$kafkaVersion") {
+    // 4.1.45.Final has a Uncontrolled Memory Allocation issue.
+    // we exclude netty, and force the fixed version
+    // dependabot will sort us out...
+    exclude group: "io.netty"
+  }
   compile ("com.fasterxml.jackson.core:jackson-databind:2.10.3")
   compile ("commons-collections:commons-collections:3.2.2")
+
+  // Minimal netty specification
+  implementation ("io.netty:netty-handler:$nettyVersion")
+  implementation ("io.netty:netty-transport-native-epoll:$nettyVersion")
+  implementation ("io.netty:netty-codec:$nettyVersion")
 
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
   umlDoclet("nl.talsmasoftware:umldoclet:1.1.4")
