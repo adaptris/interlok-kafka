@@ -4,7 +4,7 @@ plugins {
   id 'maven'
   id 'maven-publish'
   id  "jacoco"
-  id 'com.github.spotbugs' version '3.0.0'
+  id 'com.github.spotbugs' version '4.0.5'
 }
 ext {
   interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.10-SNAPSHOT'
@@ -23,8 +23,9 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
-  log4j2Version = '2.13.0'
-  kafkaVersion = '2.4.0'
+  log4j2Version = '2.13.2'
+  kafkaVersion = '2.4.1'
+  nettyVersion='4.1.49.Final'
 }
 
 ext.hasGraphViz = { ->
@@ -95,6 +96,11 @@ configurations {
   all*.exclude group: 'net.sf.saxon', module: 'saxon'
   all*.exclude group: 'org.codehaus.woodstox'
   all*.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.mail.glassfish'
+  // INTERLOK-3197 exclude old javax.mail
+  all*.exclude group: 'com.sun.mail', module: 'javax.mail'
+  all*.exclude group: 'javax.validation', module: 'validation-api'
+  all*.exclude group: 'javax.activation', module: 'activation'
+  all*.exclude group: 'javax.activation', module: 'javax.activation-api'
 }
 
 configurations.all {
@@ -106,9 +112,19 @@ dependencies {
   compile ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
   compile ("org.slf4j:slf4j-api:$slf4jVersion")
   compile ("org.apache.kafka:kafka-clients:$kafkaVersion")
-  compile ("org.apache.kafka:kafka_2.11:$kafkaVersion")
-  compile ("com.fasterxml.jackson.core:jackson-databind:2.10.2")
+  compile ("org.apache.kafka:kafka_2.11:$kafkaVersion") {
+    // 4.1.45.Final has a Uncontrolled Memory Allocation issue.
+    // we exclude netty, and force the fixed version
+    // dependabot will sort us out...
+    exclude group: "io.netty"
+  }
+  compile ("com.fasterxml.jackson.core:jackson-databind:2.10.3")
   compile ("commons-collections:commons-collections:3.2.2")
+
+  // Minimal netty specification
+  implementation ("io.netty:netty-handler:$nettyVersion")
+  implementation ("io.netty:netty-transport-native-epoll:$nettyVersion")
+  implementation ("io.netty:netty-codec:$nettyVersion")
 
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
   umlDoclet("nl.talsmasoftware:umldoclet:1.1.4")
@@ -289,25 +305,28 @@ publishing {
 }
 
 
-spotbugs {
+spotbugsMain {
+  effort = "max"
+  reportLevel = "high"
   // showProgress = "true"
   effort = "max"
   // Ignore failures?
   // ignoreFailures = false
-
-  // We only care about "high priority" issues...
-  reportLevel = "high"
+  reports {
+    xml {
+      enabled = false
+    }
+    html {
+      enabled = true
+    }
+  }
+  // includeFilter = new File("$rootDir/gradle/spotbugs-filter.xml")
+  // excludeFilter = new File("$rootDir/gradle/spotbugs-exclude.xml")
 }
 
 // disable spotbugsTests which checks our test code..
 spotbugsTest.enabled = false
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
-  reports {
-    xml.enabled = false
-    html.enabled = true
-  }
-}
 
 check.dependsOn jacocoTestReport
 javadoc.dependsOn offlinePackageList,umlJavadoc
