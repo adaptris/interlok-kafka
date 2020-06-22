@@ -101,6 +101,7 @@ configurations {
   all*.exclude group: 'javax.validation', module: 'validation-api'
   all*.exclude group: 'javax.activation', module: 'activation'
   all*.exclude group: 'javax.activation', module: 'javax.activation-api'
+  all*.exclude group: 'log4j', module: 'log4j'
 }
 
 configurations.all {
