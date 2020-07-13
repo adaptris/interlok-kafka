@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -14,27 +15,33 @@ import org.slf4j.Logger;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
+import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisPollingConsumer;
 import com.adaptris.core.ConsumeDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.NullConnection;
 import com.adaptris.core.util.Args;
+import com.adaptris.core.util.DestinationHelper;
 import com.adaptris.core.util.ExceptionHelper;
+import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.util.TimeInterval;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Wrapper around {@link KafkaConsumer}.
- * 
- * 
+ *
+ *
  * @author lchan
  * @config polling-apache-kafka-consumer
- * 
+ *
  */
 @XStreamAlias("polling-apache-kafka-consumer")
 @ComponentProfile(summary = "Receive messages via Apache Kafka", tag = "consumer,kafka", recommended = {NullConnection.class})
-@DisplayOrder(order = {"destination", "consumerConfig", "receiveTimeout", "additionalDebug"})
+@DisplayOrder(
+    order = {"topics", "destination", "consumerConfig", "receiveTimeout", "additionalDebug"})
 public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements LoggingContext {
 
   private static final TimeInterval DEFAULT_RECV_TIMEOUT_INTERVAL = new TimeInterval(2L, TimeUnit.SECONDS);
@@ -47,22 +54,35 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
   @AdvancedConfig
   private Boolean additionalDebug;
 
+  /**
+   * The consume destination contains the topics we want to consume from.
+   *
+   */
+  @Getter
+  @Setter
+  @Deprecated
+  @Valid
+  @Removal(version = "4.0.0", message = "Use 'topics' instead")
+  private ConsumeDestination destination;
+
+  /**
+   * A comma separated list of topics that you want to consume from.
+   *
+   */
+  @Getter
+  @Setter
+  // Needs to be @NotBlank when destination is removed.
+  private String topics;
+  private transient boolean destinationWarningLogged;
+
   private transient KafkaConsumer<String, AdaptrisMessage> consumer;
 
   public PollingKafkaConsumer() {
     setConsumerConfig(new BasicConsumerConfigBuilder());
   }
 
-  public PollingKafkaConsumer(ConsumeDestination d, ConsumerConfigBuilder b) {
+  public PollingKafkaConsumer(ConsumerConfigBuilder b) {
     setConsumerConfig(b);
-    setDestination(d);
-  }
-
-
-
-  @Override
-  public void init() throws CoreException {
-    super.init();
   }
 
   @Override
@@ -71,7 +91,7 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
       Map<String, Object> props = getConsumerConfig().build();
       props.put(ConfigBuilder.KEY_DESERIALIZER_FACTORY_CONFIG, getMessageFactory());
       consumer = createConsumer(props);
-      List<String> topics = Arrays.asList(Args.notBlank(getDestination().getDestination(), "topics").split("\\s*,\\s*"));
+      List<String> topics = Arrays.asList(Args.notBlank(topics(), "topics").split("\\s*,\\s*"));
       LoggingContext.LOGGER.logPartitions(this, topics, consumer);
       consumer.subscribe(topics);
     } catch (RuntimeException e) {
@@ -93,10 +113,6 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
     super.close();
   }
 
-
-  @Override
-  protected void prepareConsumer() throws CoreException {}
-
   private void closeConsumer() {
     try {
       if (consumer != null) {
@@ -114,7 +130,7 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
   protected int processMessages() {
     int proc = 0;
     try {
-      log.trace("Going to Poll with timeout {}", receiveTimeoutMs());
+      logger().trace("Going to Poll with timeout {}", receiveTimeoutMs());
       ConsumerRecords<String, AdaptrisMessage> records = consumer.poll(Duration.ofMillis(receiveTimeoutMs()));
       for (ConsumerRecord<String, AdaptrisMessage> record : records) {
         retrieveAdaptrisMessageListener().onAdaptrisMessage(record.value());
@@ -135,11 +151,12 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
   }
 
   public void setConsumerConfig(ConsumerConfigBuilder pc) {
-    this.consumerConfig = Args.notNull(pc, "consumer-config");
+    consumerConfig = Args.notNull(pc, "consumer-config");
   }
 
   long receiveTimeoutMs() {
-    return getReceiveTimeout() != null ? getReceiveTimeout().toMilliseconds() : DEFAULT_RECV_TIMEOUT_INTERVAL.toMilliseconds();
+    return TimeInterval.toMillisecondsDefaultIfNull(getReceiveTimeout(),
+        DEFAULT_RECV_TIMEOUT_INTERVAL);
   }
 
   public TimeInterval getReceiveTimeout() {
@@ -168,7 +185,7 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
 
   @Override
   public boolean additionalDebug() {
-    return getAdditionalDebug() != null ? getAdditionalDebug().booleanValue() : false;
+    return BooleanUtils.toBooleanDefaultIfNull(getAdditionalDebug(), false);
   }
 
   @Override
@@ -178,11 +195,33 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
 
   /**
    * Set the receive timeout.
-   * 
+   *
    * @param rt the receive timout.
    */
   public void setReceiveTimeout(TimeInterval rt) {
-    this.receiveTimeout = rt;
+    receiveTimeout = rt;
+  }
+
+  public PollingKafkaConsumer withTopics(String s) {
+    setTopics(s);
+    return this;
+  }
+
+  @Override
+  protected void prepareConsumer() throws CoreException {
+    DestinationHelper.logConsumeDestinationWarning(destinationWarningLogged,
+        () -> destinationWarningLogged = true, getDestination(),
+        "{} uses destination, use topics instead", LoggingHelper.friendlyName(this));
+    DestinationHelper.mustHaveEither(getTopics(), getDestination());
+  }
+
+  private String topics() {
+    return DestinationHelper.consumeDestination(getTopics(), getDestination());
+  }
+
+  @Override
+  protected String newThreadName() {
+    return DestinationHelper.threadName(retrieveAdaptrisMessageListener(), getDestination());
   }
 
 }

@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.lang3.StringUtils;
+import javax.validation.Valid;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.InvalidOffsetException;
@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
+import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
 import com.adaptris.core.ConsumeDestination;
@@ -24,48 +25,61 @@ import com.adaptris.core.CoreException;
 import com.adaptris.core.InitialisedState;
 import com.adaptris.core.StartedState;
 import com.adaptris.core.util.Args;
+import com.adaptris.core.util.DestinationHelper;
 import com.adaptris.core.util.ExceptionHelper;
+import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.core.util.ManagedThreadFactory;
 import com.adaptris.kafka.ConfigDefinition.FilterKeys;
 import com.adaptris.util.TimeInterval;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Wrapper around {@link KafkaConsumer}.
- * 
- * 
+ *
+ *
  * @author lchan
  * @config standard-apache-kafka-consumer
- * 
+ *
  */
 @XStreamAlias("standard-apache-kafka-consumer")
 @ComponentProfile(summary = "Receive messages via Apache Kafka", tag = "consumer,kafka", recommended =
 {
     KafkaConnection.class
 }, since = "3.6.6")
-@DisplayOrder(order = {"destination", "additionalDebug"})
+@DisplayOrder(order = {"topics", "destination", "additionalDebug"})
 public class StandardKafkaConsumer extends AdaptrisMessageConsumerImp implements LoggingContext {
 
   private static final TimeInterval DEFAULT_RECV_TIMEOUT_INTERVAL = new TimeInterval(100L, TimeUnit.MILLISECONDS);
 
   @AdvancedConfig
   private Boolean additionalDebug;
+  /**
+   * The consume destination contains the topics we want to consume from.
+   *
+   */
+  @Getter
+  @Setter
+  @Deprecated
+  @Valid
+  @Removal(version = "4.0.0", message = "Use 'topics' instead")
+  private ConsumeDestination destination;
+
+  /**
+   * A comma separated list of topics that you want to consume from.
+   *
+   */
+  @Getter
+  @Setter
+  // Needs to be @NotBlank when destination is removed.
+  private String topics;
+  private transient boolean destinationWarningLogged;
 
   private transient KafkaConsumer<String, AdaptrisMessage> consumer;
 
   public StandardKafkaConsumer() {
   }
-
-  public StandardKafkaConsumer(ConsumeDestination d) {
-    this();
-    setDestination(d);
-  }
-
-  @Override
-  public void prepare() throws CoreException {
-
-  }
-
 
   @Override
   public void init() throws CoreException {}
@@ -76,10 +90,11 @@ public class StandardKafkaConsumer extends AdaptrisMessageConsumerImp implements
       Map<String, Object> props = retrieveConnection(KafkaConnection.class).buildConfig(FilterKeys.Consumer);
       props.put(ConfigBuilder.KEY_DESERIALIZER_FACTORY_CONFIG, getMessageFactory());
       consumer = createConsumer(props);
-      List<String> topics = Arrays.asList(Args.notBlank(getDestination().getDestination(), "topics").split("\\s*,\\s*"));
+      List<String> topics = Arrays.asList(Args.notBlank(topics(), "topics").split("\\s*,\\s*"));
       LoggingContext.LOGGER.logPartitions(this, topics, consumer);
       consumer.subscribe(topics);
-      String threadName = StringUtils.defaultIfBlank(getDestination().getDeliveryThreadName(), "KafkaConsumer");
+      String threadName = DestinationHelper.threadName(retrieveAdaptrisMessageListener(),
+          getDestination(), "KafkaConsumer");
       ManagedThreadFactory.createThread(threadName, new MessageConsumerRunnable()).start();
     } catch (RuntimeException e) {
       // ConfigException extends KafkaException which is a RTE
@@ -148,6 +163,31 @@ public class StandardKafkaConsumer extends AdaptrisMessageConsumerImp implements
     return retrieveComponentState().equals(StartedState.getInstance())
         || retrieveComponentState().equals(InitialisedState.getInstance());
   }
+
+  @Override
+  public void prepare() throws CoreException {
+    DestinationHelper.logConsumeDestinationWarning(destinationWarningLogged,
+        () -> destinationWarningLogged = true, getDestination(),
+        "{} uses destination, use topics instead", LoggingHelper.friendlyName(this));
+    DestinationHelper.mustHaveEither(getTopics(), getDestination());
+  }
+
+
+  public StandardKafkaConsumer withTopics(String s) {
+    setTopics(s);
+    return this;
+  }
+
+
+  private String topics() {
+    return DestinationHelper.consumeDestination(getTopics(), getDestination());
+  }
+
+  @Override
+  protected String newThreadName() {
+    return DestinationHelper.threadName(retrieveAdaptrisMessageListener(), getDestination());
+  }
+
 
   private class MessageConsumerRunnable implements Runnable {
     @Override

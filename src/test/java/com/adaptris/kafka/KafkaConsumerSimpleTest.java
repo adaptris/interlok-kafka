@@ -2,7 +2,6 @@ package com.adaptris.kafka;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.adaptris.core.ConfiguredConsumeDestination;
 import com.adaptris.core.ConsumerCase;
 import com.adaptris.core.StandaloneConsumer;
 
@@ -23,7 +22,7 @@ public class KafkaConsumerSimpleTest extends ConsumerCase {
 
   @Override
   protected Object retrieveObjectForSampleConfig() {
-    StandardKafkaConsumer c = new StandardKafkaConsumer(new ConfiguredConsumeDestination("myTopic"));
+    StandardKafkaConsumer c = new StandardKafkaConsumer().withTopics("myTopic");
     return new StandaloneConsumer(new KafkaConnection(new SimpleConfigBuilder("localhost:4242")), c);
   }
 

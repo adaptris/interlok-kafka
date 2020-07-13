@@ -16,7 +16,6 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.BaseCase;
 import com.adaptris.core.ClosedState;
-import com.adaptris.core.ConfiguredConsumeDestination;
 import com.adaptris.core.ConfiguredProduceDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.InitialisedState;
@@ -140,7 +139,7 @@ public class InlineKafkaCase {
     // Change MAX_BLOCK to stop each test from taking ~60000 which is the default block...
     // Can't figure out why KafkaProducer is why it is atm.
     builder.getConfig().add(new KeyValuePair(ProducerConfig.MAX_BLOCK_MS_CONFIG, "100"));
-    
+
     return new StandaloneProducer(new KafkaConnection(builder),
         createProducer(recordKey, new ConfiguredProduceDestination(topic)));
   }
@@ -149,7 +148,7 @@ public class InlineKafkaCase {
     AdvancedConsumerConfigBuilder builder = new AdvancedConsumerConfigBuilder();
     builder.getConfig().add(new KeyValuePair(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer));
     builder.getConfig().add(new KeyValuePair(ConsumerConfig.GROUP_ID_CONFIG, "group"));
-    StandardKafkaConsumer result = new StandardKafkaConsumer(new ConfiguredConsumeDestination(topic));
+    StandardKafkaConsumer result = new StandardKafkaConsumer().withTopics(topic);
     return result;
   }
 
