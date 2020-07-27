@@ -2,21 +2,19 @@ package com.adaptris.kafka;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.kafka.clients.producer.ProducerRecord;
-
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.core.AdaptrisMessage;
-import com.adaptris.core.ProduceDestination;
 import com.adaptris.validation.constraints.NumberExpression;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Extension of {@link StandardKafkaProducer} that allows you to specify a partition.
- * 
- * 
+ *
+ *
  * @config partitioned-apache-kafka-producer
- * 
+ *
  */
 @XStreamAlias("partitioned-apache-kafka-producer")
 @ComponentProfile(summary = "Produce messages to Apache Kafka with a specific partition number", tag = "producer,kafka", recommended =
@@ -34,10 +32,10 @@ public class PartitionedKafkaProducer extends StandardKafkaProducer {
     super();
   }
 
-  public PartitionedKafkaProducer(String recordKey, ProduceDestination d) {
+  public PartitionedKafkaProducer(String recordKey, String topic) {
     this();
     setRecordKey(recordKey);
-    setDestination(d);
+    setTopic(topic);
   }
 
   @Override
@@ -66,12 +64,12 @@ public class PartitionedKafkaProducer extends StandardKafkaProducer {
 
   /**
    * Set the partition.
-   * 
+   *
    * @param s the partition; can be of the form {@code %message{key1}} to use the metadata value associated with {@code key1}. If it
    *          doesn't resolve to an Integer; then {@code null} is used.
    */
   public void setPartition(String s) {
-    this.partition = s;
+    partition = s;
   }
 
   public <T extends PartitionedKafkaProducer> T withPartition(String s) {

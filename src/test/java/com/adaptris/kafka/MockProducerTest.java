@@ -3,9 +3,7 @@ package com.adaptris.kafka;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-
 import java.util.Map;
-
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.KafkaException;
@@ -17,11 +15,9 @@ import org.junit.rules.TestName;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.BaseCase;
-import com.adaptris.core.ConfiguredProduceDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.ServiceCase;
 import com.adaptris.core.ServiceException;
@@ -37,12 +33,10 @@ public class MockProducerTest {
   public TestName testName = new TestName();
 
   @BeforeClass
-  public static void setUpClass() throws Exception {
-  }
+  public static void setUpClass() throws Exception {}
 
   @AfterClass
-  public static void tearDownClass() {
-  }
+  public static void tearDownClass() {}
 
   @Test
   public void testProducerLifecycle_NoRecordKey() throws Exception {
@@ -54,14 +48,13 @@ public class MockProducerTest {
         return kafkaProducer;
       }
     };
+    producer.setTopic(text);
     try {
       LifecycleHelper.initAndStart(producer);
       fail();
-    }
-    catch (CoreException e) {
+    } catch (CoreException e) {
 
-    }
-    finally {
+    } finally {
       LifecycleHelper.stopAndClose(producer);
     }
   }
@@ -77,11 +70,11 @@ public class MockProducerTest {
       }
     };
     producer.setRecordKey("hello");
+    producer.setTopic(text);
     producer.setProducerConfig(new BasicProducerConfigBuilder("localhost:1234"));
     try {
       LifecycleHelper.initAndStart(producer);
-    }
-    finally {
+    } finally {
       LifecycleHelper.stopAndClose(producer);
     }
   }
@@ -97,11 +90,12 @@ public class MockProducerTest {
       }
     };
     producer.setRecordKey("hello");
-    StandaloneProducer sp = new StandaloneProducer(new KafkaConnection(new SimpleConfigBuilder("localhost:9999")), producer);
+    producer.setTopic(text);
+    StandaloneProducer sp = new StandaloneProducer(
+        new KafkaConnection(new SimpleConfigBuilder("localhost:9999")), producer);
     try {
       LifecycleHelper.initAndStart(sp);
-    }
-    finally {
+    } finally {
       LifecycleHelper.stopAndClose(sp);
     }
   }
@@ -110,19 +104,19 @@ public class MockProducerTest {
   public void testProducerLifecycle_WithException_Legacy() throws Exception {
     final String text = testName.getMethodName();
     final KafkaProducer<String, AdaptrisMessage> kafkaProducer = Mockito.mock(KafkaProducer.class);
-    StandardKafkaProducer producer = new StandardKafkaProducer(text, new ConfiguredProduceDestination(text),
-        new BasicProducerConfigBuilder()) {
-      @Override
-      protected KafkaProducer<String, AdaptrisMessage> createProducer(Map<String, Object> config) {
-        throw new RuntimeException(text);
-      }
-    };
+    StandardKafkaProducer producer =
+        new StandardKafkaProducer(text, text, new BasicProducerConfigBuilder()) {
+          @Override
+          protected KafkaProducer<String, AdaptrisMessage> createProducer(
+              Map<String, Object> config) {
+            throw new RuntimeException(text);
+          }
+        };
     try {
       LifecycleHelper.init(producer);
       LifecycleHelper.start(producer);
       fail();
-    }
-    catch (CoreException e) {
+    } catch (CoreException e) {
       assertNotNull(e.getCause());
       assertEquals(text, e.getCause().getMessage());
       BaseCase.stop(producer);
@@ -133,19 +127,20 @@ public class MockProducerTest {
   public void testProducerLifecycle_WithException() throws Exception {
     final String text = testName.getMethodName();
     final KafkaProducer<String, AdaptrisMessage> kafkaProducer = Mockito.mock(KafkaProducer.class);
-    StandaloneProducer producer = new StandaloneProducer(new KafkaConnection(new SimpleConfigBuilder("localhost:5672")),
-        new StandardKafkaProducer(text, new ConfiguredProduceDestination(text)) {
-          @Override
-          protected KafkaProducer<String, AdaptrisMessage> createProducer(Map<String, Object> config) {
-            throw new RuntimeException(text);
-          }
-        });
+    StandaloneProducer producer =
+        new StandaloneProducer(new KafkaConnection(new SimpleConfigBuilder("localhost:5672")),
+            new StandardKafkaProducer(text, text) {
+              @Override
+              protected KafkaProducer<String, AdaptrisMessage> createProducer(
+                  Map<String, Object> config) {
+                throw new RuntimeException(text);
+              }
+            });
     try {
       LifecycleHelper.init(producer);
       LifecycleHelper.start(producer);
       fail();
-    }
-    catch (CoreException e) {
+    } catch (CoreException e) {
       assertNotNull(e.getCause());
       assertEquals(text, e.getCause().getMessage());
       BaseCase.stop(producer);
@@ -156,21 +151,22 @@ public class MockProducerTest {
   public void testProduce_WithException_Legacy() throws Exception {
     String text = testName.getMethodName();
     final KafkaProducer<String, AdaptrisMessage> kafkaProducer = Mockito.mock(KafkaProducer.class);
-    StandardKafkaProducer producer = new StandardKafkaProducer(text, new ConfiguredProduceDestination(text),
-        new BasicProducerConfigBuilder()) {
-      @Override
-      protected KafkaProducer<String, AdaptrisMessage> createProducer(Map<String, Object> config) {
-        return kafkaProducer;
-      }
-    };
-    Mockito.when(kafkaProducer.send((ProducerRecord<String, AdaptrisMessage>) Mockito.any())).thenThrow(new KafkaException(text));
+    StandardKafkaProducer producer =
+        new StandardKafkaProducer(text, text, new BasicProducerConfigBuilder()) {
+          @Override
+          protected KafkaProducer<String, AdaptrisMessage> createProducer(
+              Map<String, Object> config) {
+            return kafkaProducer;
+          }
+        };
+    Mockito.when(kafkaProducer.send((ProducerRecord<String, AdaptrisMessage>) Mockito.any()))
+        .thenThrow(new KafkaException(text));
     StandaloneProducer sp = new StandaloneProducer(producer);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(text);
     try {
       ServiceCase.execute(sp, msg);
       fail();
-    }
-    catch (ServiceException expected) {
+    } catch (ServiceException expected) {
       assertNotNull(expected.getCause());
       assertEquals(text, expected.getCause().getMessage());
     }
@@ -180,20 +176,22 @@ public class MockProducerTest {
   public void testProduce_WithException() throws Exception {
     String text = testName.getMethodName();
     final KafkaProducer<String, AdaptrisMessage> kafkaProducer = Mockito.mock(KafkaProducer.class);
-    StandaloneProducer producer = new StandaloneProducer(new KafkaConnection(new SimpleConfigBuilder("localhost:1234")),
-        new StandardKafkaProducer(text, new ConfiguredProduceDestination(text)) {
-          @Override
-          protected KafkaProducer<String, AdaptrisMessage> createProducer(Map<String, Object> config) {
-            return kafkaProducer;
-          }
-        });
-    Mockito.when(kafkaProducer.send((ProducerRecord<String, AdaptrisMessage>) Mockito.any())).thenThrow(new KafkaException(text));
+    StandaloneProducer producer =
+        new StandaloneProducer(new KafkaConnection(new SimpleConfigBuilder("localhost:1234")),
+            new StandardKafkaProducer(text, text) {
+              @Override
+              protected KafkaProducer<String, AdaptrisMessage> createProducer(
+                  Map<String, Object> config) {
+                return kafkaProducer;
+              }
+            });
+    Mockito.when(kafkaProducer.send((ProducerRecord<String, AdaptrisMessage>) Mockito.any()))
+        .thenThrow(new KafkaException(text));
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(text);
     try {
       ServiceCase.execute(producer, msg);
       fail();
-    }
-    catch (ServiceException expected) {
+    } catch (ServiceException expected) {
       assertNotNull(expected.getCause());
       assertEquals(text, expected.getCause().getMessage());
     }
@@ -203,13 +201,14 @@ public class MockProducerTest {
   public void testProduce_Legacy() throws Exception {
     String text = testName.getMethodName();
     final KafkaProducer<String, AdaptrisMessage> kafkaProducer = Mockito.mock(KafkaProducer.class);
-    StandardKafkaProducer producer = new StandardKafkaProducer(text, new ConfiguredProduceDestination(text),
-        new BasicProducerConfigBuilder()) {
-      @Override
-      protected KafkaProducer<String, AdaptrisMessage> createProducer(Map<String, Object> config) {
-        return kafkaProducer;
-      }
-    };
+    StandardKafkaProducer producer =
+        new StandardKafkaProducer(text, text, new BasicProducerConfigBuilder()) {
+          @Override
+          protected KafkaProducer<String, AdaptrisMessage> createProducer(
+              Map<String, Object> config) {
+            return kafkaProducer;
+          }
+        };
     StandaloneProducer sp = new StandaloneProducer(producer);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(text);
     ServiceCase.execute(sp, msg);
@@ -219,13 +218,15 @@ public class MockProducerTest {
   public void testProduce() throws Exception {
     String text = testName.getMethodName();
     final KafkaProducer<String, AdaptrisMessage> kafkaProducer = Mockito.mock(KafkaProducer.class);
-    StandaloneProducer producer = new StandaloneProducer(new KafkaConnection(new SimpleConfigBuilder("localhost:12345")),
-        new StandardKafkaProducer(text, new ConfiguredProduceDestination(text)) {
-          @Override
-          protected KafkaProducer<String, AdaptrisMessage> createProducer(Map<String, Object> config) {
-            return kafkaProducer;
-          }
-        });
+    StandaloneProducer producer =
+        new StandaloneProducer(new KafkaConnection(new SimpleConfigBuilder("localhost:12345")),
+            new StandardKafkaProducer(text, text) {
+              @Override
+              protected KafkaProducer<String, AdaptrisMessage> createProducer(
+                  Map<String, Object> config) {
+                return kafkaProducer;
+              }
+            });
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(text);
     ServiceCase.execute(producer, msg);
   }
@@ -234,13 +235,15 @@ public class MockProducerTest {
   public void testProduce_PartitionedProducer_InvalidPartition() throws Exception {
     String text = testName.getMethodName();
     final KafkaProducer<String, AdaptrisMessage> kafkaProducer = Mockito.mock(KafkaProducer.class);
-    StandaloneProducer producer = new StandaloneProducer(new KafkaConnection(new SimpleConfigBuilder("localhost:12345")),
-        new PartitionedKafkaProducer(text, new ConfiguredProduceDestination(text)) {
-          @Override
-          protected KafkaProducer<String, AdaptrisMessage> createProducer(Map<String, Object> config) {
-            return kafkaProducer;
-          }
-        }.withPartition("XXX"));
+    StandaloneProducer producer =
+        new StandaloneProducer(new KafkaConnection(new SimpleConfigBuilder("localhost:12345")),
+            new PartitionedKafkaProducer(text, text) {
+              @Override
+              protected KafkaProducer<String, AdaptrisMessage> createProducer(
+                  Map<String, Object> config) {
+                return kafkaProducer;
+              }
+            }.withPartition("XXX"));
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(text);
     ServiceCase.execute(producer, msg);
   }
@@ -249,13 +252,15 @@ public class MockProducerTest {
   public void testProduce_PartitionedProducer_WithPartition() throws Exception {
     String text = testName.getMethodName();
     final KafkaProducer<String, AdaptrisMessage> kafkaProducer = Mockito.mock(KafkaProducer.class);
-    StandaloneProducer producer = new StandaloneProducer(new KafkaConnection(new SimpleConfigBuilder("localhost:12345")),
-        new PartitionedKafkaProducer(text, new ConfiguredProduceDestination(text)) {
-          @Override
-          protected KafkaProducer<String, AdaptrisMessage> createProducer(Map<String, Object> config) {
-            return kafkaProducer;
-          }
-        }.withPartition("0"));
+    StandaloneProducer producer =
+        new StandaloneProducer(new KafkaConnection(new SimpleConfigBuilder("localhost:12345")),
+            new PartitionedKafkaProducer(text, text) {
+              @Override
+              protected KafkaProducer<String, AdaptrisMessage> createProducer(
+                  Map<String, Object> config) {
+                return kafkaProducer;
+              }
+            }.withPartition("0"));
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(text);
     ServiceCase.execute(producer, msg);
   }

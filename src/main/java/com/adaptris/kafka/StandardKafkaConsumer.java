@@ -166,7 +166,7 @@ public class StandardKafkaConsumer extends AdaptrisMessageConsumerImp implements
 
   @Override
   public void prepare() throws CoreException {
-    DestinationHelper.logConsumeDestinationWarning(destinationWarningLogged,
+    DestinationHelper.logWarningIfNotNull(destinationWarningLogged,
         () -> destinationWarningLogged = true, getDestination(),
         "{} uses destination, use topics instead", LoggingHelper.friendlyName(this));
     DestinationHelper.mustHaveEither(getTopics(), getDestination());

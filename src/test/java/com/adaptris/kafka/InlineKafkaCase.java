@@ -50,7 +50,7 @@ public class InlineKafkaCase {
     // No BootstrapServer, so we're duff.
     AdvancedConfigBuilder builder = new AdvancedConfigBuilder();
     StandaloneProducer p = new StandaloneProducer(new KafkaConnection(builder),
-        new StandardKafkaProducer(text, new ConfiguredProduceDestination(text)));
+        new StandardKafkaProducer(text, text));
     try {
       LifecycleHelper.init(p);
       try {
@@ -154,7 +154,9 @@ public class InlineKafkaCase {
 
 
   private PartitionedKafkaProducer createProducer(String recordKey, ProduceDestination d) {
-    PartitionedKafkaProducer result = new PartitionedKafkaProducer(recordKey, d);
+    PartitionedKafkaProducer result = new PartitionedKafkaProducer();
+    result.setRecordKey(recordKey);
+    result.setDestination(d);
     result.setPartition("1");
     return result;
   }

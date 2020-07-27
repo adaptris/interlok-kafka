@@ -209,7 +209,7 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
 
   @Override
   protected void prepareConsumer() throws CoreException {
-    DestinationHelper.logConsumeDestinationWarning(destinationWarningLogged,
+    DestinationHelper.logWarningIfNotNull(destinationWarningLogged,
         () -> destinationWarningLogged = true, getDestination(),
         "{} uses destination, use topics instead", LoggingHelper.friendlyName(this));
     DestinationHelper.mustHaveEither(getTopics(), getDestination());
