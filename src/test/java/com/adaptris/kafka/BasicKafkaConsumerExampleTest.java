@@ -2,7 +2,6 @@ package com.adaptris.kafka;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.adaptris.core.ConfiguredConsumeDestination;
 import com.adaptris.core.ConsumerCase;
 import com.adaptris.core.StandaloneConsumer;
 
@@ -24,7 +23,7 @@ public class BasicKafkaConsumerExampleTest extends ConsumerCase {
   @Override
   protected Object retrieveObjectForSampleConfig() {
     BasicConsumerConfigBuilder b = new BasicConsumerConfigBuilder("localhost:4242");
-    PollingKafkaConsumer c = new PollingKafkaConsumer(new ConfiguredConsumeDestination("myTopic"), b);
+    PollingKafkaConsumer c = new PollingKafkaConsumer(b).withTopics("myTopic");
     return new StandaloneConsumer(c);
   }
 

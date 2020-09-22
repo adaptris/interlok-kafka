@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.BaseCase;
-import com.adaptris.core.ConfiguredConsumeDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.FixedIntervalPoller;
 import com.adaptris.core.StandaloneConsumer;
@@ -75,12 +74,13 @@ public class MockPollingConsumerTest {
     final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = Mockito.mock(KafkaConsumer.class);
     ConsumerRecords<String, AdaptrisMessage> records = Mockito.mock(ConsumerRecords.class);
     PollingKafkaConsumer consumer =
-        new PollingKafkaConsumer(new ConfiguredConsumeDestination(text), new BasicConsumerConfigBuilder("localhost:2342")) {
+        new PollingKafkaConsumer(new BasicConsumerConfigBuilder("localhost:2342")) {
           @Override
           KafkaConsumer<String, AdaptrisMessage> createConsumer(Map<String, Object> config) {
             return kafkaConsumer;
           }
         };
+    consumer.withTopics(text);
     Mockito.when(records.count()).thenReturn(0);
     Mockito.when(records.iterator()).thenReturn(new ArrayList<ConsumerRecord<String, AdaptrisMessage>>().iterator());
     Mockito.when(kafkaConsumer.poll(Mockito.anyLong())).thenReturn(records);
@@ -101,12 +101,14 @@ public class MockPollingConsumerTest {
     final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = Mockito.mock(KafkaConsumer.class);
     ConsumerRecords<String, AdaptrisMessage> records = Mockito.mock(ConsumerRecords.class);
     PollingKafkaConsumer consumer =
-        new PollingKafkaConsumer(new ConfiguredConsumeDestination(text), new BasicConsumerConfigBuilder("localhost:2342")) {
+        new PollingKafkaConsumer(new BasicConsumerConfigBuilder("localhost:2342")) {
           @Override
           KafkaConsumer<String, AdaptrisMessage> createConsumer(Map<String, Object> config) {
             throw new RuntimeException(text);
           }
         };
+    consumer.withTopics(text);
+    consumer.setAdditionalDebug(true);
     Mockito.when(records.count()).thenReturn(0);
     Mockito.when(records.iterator()).thenReturn(new ArrayList<ConsumerRecord<String, AdaptrisMessage>>().iterator());
     Mockito.when(kafkaConsumer.poll(Mockito.anyLong())).thenReturn(records);
@@ -135,13 +137,13 @@ public class MockPollingConsumerTest {
     ConsumerRecord<String, AdaptrisMessage> record = new ConsumerRecord<String, AdaptrisMessage>(text, 0, 0, text, msg);
 
     PollingKafkaConsumer consumer =
-        new PollingKafkaConsumer(new ConfiguredConsumeDestination(text), new BasicConsumerConfigBuilder("localhost:2424")) {
+        new PollingKafkaConsumer(new BasicConsumerConfigBuilder("localhost:2424")) {
           @Override
           KafkaConsumer<String, AdaptrisMessage> createConsumer(Map<String, Object> config) {
             return kafkaConsumer;
           }
         };
-        
+    consumer.withTopics(text);
     consumer.setPoller(new FixedIntervalPoller(new TimeInterval(100L, TimeUnit.MILLISECONDS)));
 
     Mockito.when(records.count()).thenReturn(1);
@@ -174,13 +176,14 @@ public class MockPollingConsumerTest {
     ConsumerRecords<String, AdaptrisMessage> records = Mockito.mock(ConsumerRecords.class);
     ConsumerRecord<String, AdaptrisMessage> record = new ConsumerRecord<String, AdaptrisMessage>(text, 0, 0, text, msg);
 
-    PollingKafkaConsumer consumer = new PollingKafkaConsumer(new ConfiguredConsumeDestination(text),
+    PollingKafkaConsumer consumer = new PollingKafkaConsumer(
         new BasicConsumerConfigBuilder("localhost:4242", testName.getMethodName())) {
       @Override
       KafkaConsumer<String, AdaptrisMessage> createConsumer(Map<String, Object> config) {
         return kafkaConsumer;
       }
     };
+    consumer.withTopics(text);
 
     consumer.setPoller(new FixedIntervalPoller(new TimeInterval(100L, TimeUnit.MILLISECONDS)));
 

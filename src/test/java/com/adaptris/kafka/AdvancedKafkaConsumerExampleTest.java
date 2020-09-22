@@ -3,7 +3,6 @@ package com.adaptris.kafka;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.adaptris.core.ConfiguredConsumeDestination;
 import com.adaptris.core.ConsumerCase;
 import com.adaptris.core.StandaloneConsumer;
 import com.adaptris.util.KeyValuePair;
@@ -31,7 +30,9 @@ public class AdvancedKafkaConsumerExampleTest extends ConsumerCase {
     myConfig.add(new KeyValuePair(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, "2000"));
     myConfig.add(new KeyValuePair(ConsumerConfig.CONNECTIONS_MAX_IDLE_MS_CONFIG, "62000"));
     myConfig.add(new KeyValuePair(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000"));
-    PollingKafkaConsumer c = new PollingKafkaConsumer(new ConfiguredConsumeDestination("myTopic"),new AdvancedConsumerConfigBuilder(myConfig));
+    PollingKafkaConsumer c =
+        new PollingKafkaConsumer(new AdvancedConsumerConfigBuilder(myConfig))
+            .withTopics("myTopic");
     return new StandaloneConsumer(c);
   }
 

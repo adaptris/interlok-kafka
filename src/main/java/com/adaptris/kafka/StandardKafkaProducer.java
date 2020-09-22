@@ -1,16 +1,15 @@
 package com.adaptris.kafka;
 
 import java.util.Map;
-
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldHint;
+import com.adaptris.annotation.Removal;
 import com.adaptris.core.AdaptrisConnection;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
@@ -18,18 +17,22 @@ import com.adaptris.core.ProduceDestination;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.ProduceOnlyProducerImp;
 import com.adaptris.core.util.Args;
+import com.adaptris.core.util.DestinationHelper;
 import com.adaptris.core.util.ExceptionHelper;
+import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.kafka.ConfigDefinition.FilterKeys;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Wrapper around {@link KafkaProducer}.
- * 
- * 
+ *
+ *
  * @author gdries
  * @author lchan
  * @config standard-apache-kafka-producer
- * 
+ *
  */
 @XStreamAlias("standard-apache-kafka-producer")
 @ComponentProfile(summary = "Deliver messages via Apache Kafka", tag = "producer,kafka", recommended = {KafkaConnection.class})
@@ -43,22 +46,45 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   @AdvancedConfig
   private ProducerConfigBuilder producerConfig;
 
+  /**
+   * The destination represents the Kafka Topic to produce to
+   *
+   */
+  @Getter
+  @Setter
+  @Deprecated
+  @Valid
+  @Removal(version = "4.0.0", message = "Use 'topic' instead")
+  private ProduceDestination destination;
+
+  /**
+   * The Kafka Topic
+   *
+   */
+  @InputFieldHint(expression = true)
+  @Getter
+  @Setter
+  // Needs to be @NotBlank when destination is removed.
+  private String topic;
+
+  private transient boolean destWarning;
+
   protected transient KafkaProducer<String, AdaptrisMessage> producer;
   protected transient boolean configFromConnection;
 
   public StandardKafkaProducer() {
   }
 
-  public StandardKafkaProducer(String recordKey, ProduceDestination d) {
+  public StandardKafkaProducer(String recordKey, String topic) {
     setRecordKey(recordKey);
-    setDestination(d);
+    setTopic(topic);
   }
 
   @Deprecated
-  StandardKafkaProducer(String recordKey, ProduceDestination d, ProducerConfigBuilder b) {
+  StandardKafkaProducer(String recordKey, String topic, ProducerConfigBuilder b) {
     this();
     setRecordKey(recordKey);
-    setDestination(d);
+    setTopic(topic);
     setProducerConfig(b);
   }
 
@@ -95,12 +121,16 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   public void close() {}
 
   @Override
-  public void prepare() throws CoreException {}
+  public void prepare() throws CoreException {
+    DestinationHelper.logWarningIfNotNull(destWarning, () -> destWarning = true, getDestination(),
+        "{} uses destination, use 'topic' instead", LoggingHelper.friendlyName(this));
+    DestinationHelper.mustHaveEither(getTopic(), getDestination());
+  }
 
   @Override
-  public void produce(AdaptrisMessage msg, ProduceDestination destination) throws ProduceException {
+  protected void doProduce(AdaptrisMessage msg, String topic)
+      throws ProduceException {
     try {
-      String topic = destination.getDestination(msg);
       String key = msg.resolve(getRecordKey());
       producer.send(createProducerRecord(topic, key, msg));
     } catch (Exception e) {
@@ -126,7 +156,7 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   }
 
   /**
-   * 
+   *
    * @deprecated since 3.7.0 use a {@link KafkaConnection} instead.
    */
   @Deprecated
@@ -135,12 +165,12 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   }
 
   /**
-   * 
+   *
    * @deprecated since 3.7.0 use a {@link KafkaConnection} instead.
    */
   @Deprecated
   public void setProducerConfig(ProducerConfigBuilder pc) {
-    this.producerConfig = pc;
+    producerConfig = pc;
   }
 
   public String getRecordKey() {
@@ -149,11 +179,11 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
 
   /**
    * Set the key for the generated {@link ProducerRecord}.
-   * 
+   *
    * @param k
    */
   public void setRecordKey(String k) {
-    this.recordKey = Args.notNull(k, "key");
+    recordKey = Args.notNull(k, "key");
   }
 
   @Override
@@ -163,5 +193,10 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
       configFromConnection = true;
     }
 
+  }
+
+  @Override
+  public String endpoint(AdaptrisMessage msg) throws ProduceException {
+    return DestinationHelper.resolveProduceDestination(getTopic(), getDestination(), msg);
   }
 }
