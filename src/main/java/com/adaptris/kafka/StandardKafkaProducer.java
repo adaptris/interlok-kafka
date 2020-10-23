@@ -9,7 +9,7 @@ import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldHint;
-import com.adaptris.annotation.Removal;
+import com.adaptris.validation.constraints.ConfigDeprecated;
 import com.adaptris.core.AdaptrisConnection;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
@@ -54,7 +54,7 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   @Setter
   @Deprecated
   @Valid
-  @Removal(version = "4.0.0", message = "Use 'topic' instead")
+  @ConfigDeprecated(removalVersion = "4.0.0", message = "Use 'topic' instead", groups = Deprecated.class)
   private ProduceDestination destination;
 
   /**
