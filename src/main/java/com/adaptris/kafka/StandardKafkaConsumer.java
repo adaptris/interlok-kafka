@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
-import com.adaptris.annotation.Removal;
+import com.adaptris.validation.constraints.ConfigDeprecated;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageConsumerImp;
 import com.adaptris.core.ConsumeDestination;
@@ -63,7 +63,7 @@ public class StandardKafkaConsumer extends AdaptrisMessageConsumerImp implements
   @Setter
   @Deprecated
   @Valid
-  @Removal(version = "4.0.0", message = "Use 'topics' instead")
+  @ConfigDeprecated(removalVersion = "4.0.0", message = "Use 'topics' instead", groups = Deprecated.class)
   private ConsumeDestination destination;
 
   /**
