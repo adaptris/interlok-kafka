@@ -299,6 +299,7 @@ publishing {
         properties.appendNode("tags", "kafka,messaging")
         properties.appendNode("license", "false")
         properties.appendNode("externalUrl", "http://kafka.apache.org/")
+        properties.appendNode("repository", "https://github.com/adaptris/interlok-kafka")
       }
     }
   }
