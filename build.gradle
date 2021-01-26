@@ -4,13 +4,13 @@ plugins {
   id 'maven'
   id 'maven-publish'
   id  "jacoco"
-  id 'com.github.spotbugs' version '4.5.1'
-  id 'org.owasp.dependencycheck' version '6.0.3'
+  id 'com.github.spotbugs' version '4.6.0'
+  id 'org.owasp.dependencycheck' version '6.0.5'
   id "io.freefair.lombok" version "5.3.0"
 }
 ext {
-  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.11-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.11-SNAPSHOT'
+  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.12-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.12-SNAPSHOT'
   nexusBaseUrl = project.hasProperty('nexusBaseUrl') ? project.getProperty('nexusBaseUrl') : 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -26,7 +26,7 @@ ext {
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.30'
   kafkaVersion = '2.4.1'
-  nettyVersion='4.1.53.Final'
+  nettyVersion='4.1.56.Final'
 }
 
 ext.hasGraphViz = { ->
@@ -70,7 +70,8 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: "jacoco"
 
-sourceCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 group   = 'com.adaptris'
 version = releaseVersion
 def versionDir = "$buildDir/version"
@@ -121,7 +122,7 @@ dependencies {
     // dependabot will sort us out...
     exclude group: "io.netty"
   }
-  compile ("com.fasterxml.jackson.core:jackson-databind:2.11.3")
+  compile ("com.fasterxml.jackson.core:jackson-databind:2.12.1")
   compile ("commons-collections:commons-collections:3.2.2")
 
   // Minimal netty specification
@@ -142,8 +143,8 @@ dependencies {
   }
 
   testCompile ("com.salesforce.kafka.test:kafka-junit4:3.2.2")
-  testCompile ("org.mockito:mockito-core:3.6.0")
-  testCompile ("org.mockito:mockito-inline:3.6.0")
+  testCompile ("org.mockito:mockito-core:3.7.0")
+  testCompile ("org.mockito:mockito-inline:3.7.0")
   javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-common:$interlokCoreVersion:javadoc@jar") { changing= true}
@@ -298,6 +299,7 @@ publishing {
         properties.appendNode("tags", "kafka,messaging")
         properties.appendNode("license", "false")
         properties.appendNode("externalUrl", "http://kafka.apache.org/")
+        properties.appendNode("repository", "https://github.com/adaptris/interlok-kafka")
       }
     }
   }
