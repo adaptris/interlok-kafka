@@ -18,6 +18,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * 
  * 
  * @author lchan
+ * @config apache-kafka-connection
  *
  */
 @XStreamAlias("apache-kafka-connection")
