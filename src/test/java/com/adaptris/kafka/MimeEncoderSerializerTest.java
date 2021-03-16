@@ -15,14 +15,14 @@ public class MimeEncoderSerializerTest {
   public void testSerializer() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("Hello World");
     MimeEncoderSerializer s = new MimeEncoderSerializer();
-    s.configure(Collections.EMPTY_MAP, false);
+    s.configure(Collections.emptyMap(), false);
     assertNotNull(s.serialize("", msg));
   }
 
   @Test(expected = RuntimeException.class)
   public void testSerializer_WithException() throws Exception {
     MimeEncoderSerializer s = new MimeEncoderSerializer();
-    s.configure(Collections.EMPTY_MAP, false);
+    s.configure(Collections.emptyMap(), false);
     s.serialize("", null);
   }
 

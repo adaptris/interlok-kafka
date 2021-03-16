@@ -1,22 +1,13 @@
 package com.adaptris.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.adaptris.core.ConsumerCase;
+
 import com.adaptris.core.StandaloneConsumer;
+import com.adaptris.interlok.junit.scaffolding.ExampleConsumerCase;
 import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.KeyValuePairSet;
 
-public class AdvancedKafkaConsumerExampleTest extends ConsumerCase {
-
-  private static Logger log = LoggerFactory.getLogger(AdvancedKafkaConsumerExampleTest.class);
-
-
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
+public class AdvancedKafkaConsumerExampleTest extends ExampleConsumerCase {
 
   @Override
   protected String createBaseFileName(Object object) {
@@ -32,7 +23,7 @@ public class AdvancedKafkaConsumerExampleTest extends ConsumerCase {
     myConfig.add(new KeyValuePair(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000"));
     PollingKafkaConsumer c =
         new PollingKafkaConsumer(new AdvancedConsumerConfigBuilder(myConfig))
-            .withTopics("myTopic");
+        .withTopics("myTopic");
     return new StandaloneConsumer(c);
   }
 

@@ -34,7 +34,6 @@ public class SimpleConfigBuilderTest {
 
   }
 
-
   @Test
   public void testGroupId() {
     SimpleConfigBuilder builder = new SimpleConfigBuilder();

@@ -3,45 +3,41 @@ package com.adaptris.kafka;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
 import java.util.Set;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.BaseCase;
 import com.adaptris.core.ClosedState;
-import com.adaptris.core.ConfiguredProduceDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.InitialisedState;
-import com.adaptris.core.ProduceDestination;
-import com.adaptris.core.ServiceCase;
 import com.adaptris.core.StandaloneConsumer;
 import com.adaptris.core.StandaloneProducer;
 import com.adaptris.core.StartedState;
 import com.adaptris.core.StoppedState;
 import com.adaptris.core.stubs.MockMessageListener;
 import com.adaptris.core.util.LifecycleHelper;
+import com.adaptris.interlok.junit.scaffolding.BaseCase;
+import com.adaptris.interlok.junit.scaffolding.services.ExampleServiceCase;
 import com.adaptris.kafka.ConfigBuilder.Acks;
 import com.adaptris.util.KeyValuePair;
 import com.salesforce.kafka.test.junit4.SharedKafkaTestResource;
 
-@SuppressWarnings("deprecation")
 public class InlineKafkaCase {
-
-  private static Logger log = LoggerFactory.getLogger(InlineKafkaCase.class);
 
   @Rule
   public TestName testName = new TestName();
 
   @ClassRule
   public static final SharedKafkaTestResource INLINE_KAFKA =
-      new SharedKafkaTestResource().withBrokerProperty("auto.create.topics.enable", "false");
+  new SharedKafkaTestResource().withBrokerProperty("auto.create.topics.enable", "false");
 
 
   @Test
@@ -112,7 +108,7 @@ public class InlineKafkaCase {
       sc = createConsumer(INLINE_KAFKA.getKafkaConnectString(), text, mock);
       AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(text);
       BaseCase.start(sc);
-      ServiceCase.execute(sp, msg);
+      ExampleServiceCase.execute(sp, msg);
       BaseCase.waitForMessages(mock, 1);
       assertEquals(1, mock.getMessages().size());
       AdaptrisMessage consumed = mock.getMessages().get(0);
@@ -140,8 +136,7 @@ public class InlineKafkaCase {
     // Can't figure out why KafkaProducer is why it is atm.
     builder.getConfig().add(new KeyValuePair(ProducerConfig.MAX_BLOCK_MS_CONFIG, "100"));
 
-    return new StandaloneProducer(new KafkaConnection(builder),
-        createProducer(recordKey, new ConfiguredProduceDestination(topic)));
+    return new StandaloneProducer(new KafkaConnection(builder), createProducer(recordKey, topic));
   }
 
   private StandardKafkaConsumer createConsumer(String bootstrapServer, String topic) {
@@ -152,11 +147,10 @@ public class InlineKafkaCase {
     return result;
   }
 
-
-  private PartitionedKafkaProducer createProducer(String recordKey, ProduceDestination d) {
+  private PartitionedKafkaProducer createProducer(String recordKey, String topic) {
     PartitionedKafkaProducer result = new PartitionedKafkaProducer();
     result.setRecordKey(recordKey);
-    result.setDestination(d);
+    result.setTopic(topic);
     result.setPartition("1");
     return result;
   }

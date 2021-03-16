@@ -18,13 +18,11 @@ public class AdaptrisMessageSerializerTest {
     s.configure(new HashMap<String, Object>(), false);
   }
 
-
   @Test
   public void testClose() {
     AdaptrisMessageSerializer s = new AdaptrisMessageSerializer();
     s.close();
   }
-
 
   @Test
   public void testSerializer() throws Exception {
@@ -38,6 +36,5 @@ public class AdaptrisMessageSerializerTest {
     assertArrayEquals("Hello World".getBytes("UTF-8"), s.serialize("", utf8));
     assertArrayEquals(new byte[0], s.serialize("", empty));
   }
-
 
 }

@@ -19,6 +19,7 @@ public class AdaptrisMessageDeserializerTest {
 
   @Rule
   public TestName testName = new TestName();
+
   @Test
   public void testConfigure() {
     AdaptrisMessageDeserializer s = new AdaptrisMessageDeserializer();
@@ -28,13 +29,11 @@ public class AdaptrisMessageDeserializerTest {
     assertNotSame(AdaptrisMessageFactory.getDefaultInstance(), s.messageFactory());
   }
 
-
   @Test
   public void testClose() {
     AdaptrisMessageSerializer s = new AdaptrisMessageSerializer();
     s.close();
   }
-
 
   @Test
   public void testDeserializer() throws Exception {
@@ -45,12 +44,12 @@ public class AdaptrisMessageDeserializerTest {
     assertEquals(testName.getMethodName(), m.getMessageHeaders().get(AdaptrisMessageDeserializer.KAFKA_TOPIC_KEY));
   }
 
-
   private Map<String, Object> createConfig(String charEncoding) {
     Map<String, Object> config = new HashMap<>();
     DefaultMessageFactory f = new DefaultMessageFactory();
-    if (!isEmpty(charEncoding))
-    f.setDefaultCharEncoding(charEncoding);
+    if (!isEmpty(charEncoding)) {
+      f.setDefaultCharEncoding(charEncoding);
+    }
     config.put(ConfigBuilder.KEY_DESERIALIZER_FACTORY_CONFIG, f);
     return config;
   }

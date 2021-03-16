@@ -74,11 +74,12 @@ public class AdvancedProducerConfigBuilderTest {
 
     AdvancedProducerConfigBuilder builder = new AdvancedProducerConfigBuilder(myConfig);
     try {
-      Map<String, Object> p = builder.build();
+      builder.build();
       fail();
     } catch (CoreException e) {
       assertNotNull(e.getCause());
       assertEquals(PasswordException.class, e.getCause().getClass());
     }
   }
+
 }

@@ -1,21 +1,11 @@
 package com.adaptris.kafka;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.adaptris.core.ProducerCase;
 import com.adaptris.core.StandaloneProducer;
+import com.adaptris.interlok.junit.scaffolding.ExampleProducerCase;
 import com.adaptris.kafka.ConfigBuilder.Acks;
 import com.adaptris.kafka.ConfigBuilder.CompressionType;
 
-public class BasicKafkaProducerExampleTest extends ProducerCase {
-
-  private static Logger log = LoggerFactory.getLogger(BasicKafkaProducerExampleTest.class);
-
-
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
+public class BasicKafkaProducerExampleTest extends ExampleProducerCase {
 
   @Override
   protected String createBaseFileName(Object object) {

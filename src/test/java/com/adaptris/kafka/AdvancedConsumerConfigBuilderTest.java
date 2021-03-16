@@ -65,11 +65,12 @@ public class AdvancedConsumerConfigBuilderTest {
     AdvancedConsumerConfigBuilder builder = new AdvancedConsumerConfigBuilder(myConfig);
 
     try {
-      Map<String, Object> p = builder.build();
+      builder.build();
       fail();
     } catch (CoreException e) {
       assertNotNull(e.getCause());
       assertEquals(PasswordException.class, e.getCause().getClass());
     }
   }
+
 }

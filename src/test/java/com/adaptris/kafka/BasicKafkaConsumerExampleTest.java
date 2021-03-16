@@ -1,19 +1,9 @@
 package com.adaptris.kafka;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.adaptris.core.ConsumerCase;
 import com.adaptris.core.StandaloneConsumer;
+import com.adaptris.interlok.junit.scaffolding.ExampleConsumerCase;
 
-public class BasicKafkaConsumerExampleTest extends ConsumerCase {
-
-  private static Logger log = LoggerFactory.getLogger(BasicKafkaConsumerExampleTest.class);
-
-
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
+public class BasicKafkaConsumerExampleTest extends ExampleConsumerCase {
 
   @Override
   protected String createBaseFileName(Object object) {
