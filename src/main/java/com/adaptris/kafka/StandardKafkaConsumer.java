@@ -154,6 +154,7 @@ public class StandardKafkaConsumer extends AdaptrisMessageConsumerImp implements
 
   @Override
   public void prepare() throws CoreException {
+    Args.notNull(getTopics(), "topics");
   }
 
   public StandardKafkaConsumer withTopics(String s) {

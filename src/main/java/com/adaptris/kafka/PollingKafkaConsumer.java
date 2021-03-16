@@ -193,6 +193,7 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
 
   @Override
   protected void prepareConsumer() throws CoreException {
+    Args.notNull(getTopics(), "topics");
   }
 
   private String topics() {

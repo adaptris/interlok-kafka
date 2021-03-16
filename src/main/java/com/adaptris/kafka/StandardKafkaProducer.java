@@ -108,6 +108,7 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
 
   @Override
   public void prepare() throws CoreException {
+    Args.notNull(getTopic(), "topic");
   }
 
   @Override
