@@ -33,7 +33,6 @@ public class BasicProducerConfigBuilderTest {
 
   }
 
-
   @Test
   public void testBufferMemory() {
     BasicProducerConfigBuilder builder = new BasicProducerConfigBuilder();
@@ -46,7 +45,6 @@ public class BasicProducerConfigBuilderTest {
     assertNull(builder.getBufferMemory());
     assertEquals(DEFAULT_BUFFER_MEM, builder.bufferMemory());
   }
-
 
   @Test
   public void testCompressionType() {
@@ -61,7 +59,6 @@ public class BasicProducerConfigBuilderTest {
     assertEquals(CompressionType.none.name(), builder.compressionType());
   }
 
-
   @Test
   public void testAcks() {
     BasicProducerConfigBuilder builder = new BasicProducerConfigBuilder();
@@ -74,7 +71,6 @@ public class BasicProducerConfigBuilderTest {
     assertNull(builder.getAcks());
     assertEquals(Acks.all.actualValue(), builder.acks());
   }
-
 
   @Test
   public void testRetries() {
@@ -89,7 +85,6 @@ public class BasicProducerConfigBuilderTest {
     assertEquals(0, builder.retries());
   }
 
-
   @Test
   public void testBuild() throws Exception {
     BasicProducerConfigBuilder builder = new BasicProducerConfigBuilder();
@@ -103,4 +98,5 @@ public class BasicProducerConfigBuilderTest {
     assertEquals(StringSerializer.class.getName(), p.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG));
     assertEquals(AdaptrisMessageSerializer.class.getName(), p.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
   }
+
 }

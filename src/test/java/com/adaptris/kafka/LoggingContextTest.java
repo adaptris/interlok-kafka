@@ -1,6 +1,7 @@
 package com.adaptris.kafka;
 
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +26,7 @@ public class LoggingContextTest {
   public TestName testName = new TestName();
   @Test
   public void testLogPartitions() {
-    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = Mockito.mock(KafkaConsumer.class);
+    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mock(KafkaConsumer.class);
     List<PartitionInfo> partInfo = Arrays.asList(new PartitionInfo("topic", 1, null, new Node[0], new Node[0]));
     Mockito.when(kafkaConsumer.partitionsFor(anyString())).thenReturn(partInfo);
     LoggingContext.LOGGER.logPartitions(new LoggingContextImpl(false), Arrays.asList("hello"), kafkaConsumer);
@@ -35,7 +36,7 @@ public class LoggingContextTest {
   private class LoggingContextImpl implements LoggingContext {
     private boolean debug;
     LoggingContextImpl(boolean additionalDebug) {
-      this.debug = additionalDebug;
+      debug = additionalDebug;
     }
     @Override
     public boolean additionalDebug() {
@@ -48,4 +49,5 @@ public class LoggingContextTest {
     }
 
   }
+
 }

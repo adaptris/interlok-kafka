@@ -2,12 +2,16 @@ package com.adaptris.kafka;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.kafka.clients.producer.ProducerRecord;
+
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.validation.constraints.NumberExpression;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Extension of {@link StandardKafkaProducer} that allows you to specify a partition.
@@ -21,11 +25,20 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 {
     KafkaConnection.class
 })
-@DisplayOrder(order = {"recordKey", "partition"})
+@DisplayOrder(order = { "topic", "recordKey", "partition" })
 public class PartitionedKafkaProducer extends StandardKafkaProducer {
 
+  /**
+   * Set the partition.
+   *
+   * @param s
+   *          the partition; can be of the form {@code %message{key1}} to use the metadata value associated with {@code key1}. If it doesn't
+   *          resolve to an Integer; then {@code null} is used.
+   */
   @InputFieldHint(expression = true)
   @NumberExpression
+  @Getter
+  @Setter
   private String partition;
 
   public PartitionedKafkaProducer() {
@@ -42,7 +55,7 @@ public class PartitionedKafkaProducer extends StandardKafkaProducer {
   protected ProducerRecord<String, AdaptrisMessage> createProducerRecord(String topic, String key, AdaptrisMessage msg) {
     Integer targetPartition = toInt(msg.resolve(getPartition()));
     log.trace("Sending message [{}] to topic [{}][partition={}] with key [{}]", msg.getUniqueId(), topic, targetPartition, key);
-    return new ProducerRecord<String, AdaptrisMessage>(topic, targetPartition, key, msg);
+    return new ProducerRecord<>(topic, targetPartition, key, msg);
   }
 
   private static Integer toInt(String s) {
@@ -56,20 +69,6 @@ public class PartitionedKafkaProducer extends StandardKafkaProducer {
       // if we get %message{key} -> 0F then we'll get 15 (which might still cause problems)
     }
     return result;
-  }
-
-  public String getPartition() {
-    return partition;
-  }
-
-  /**
-   * Set the partition.
-   *
-   * @param s the partition; can be of the form {@code %message{key1}} to use the metadata value associated with {@code key1}. If it
-   *          doesn't resolve to an Integer; then {@code null} is used.
-   */
-  public void setPartition(String s) {
-    partition = s;
   }
 
   public <T extends PartitionedKafkaProducer> T withPartition(String s) {

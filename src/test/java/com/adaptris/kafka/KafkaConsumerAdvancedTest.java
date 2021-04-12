@@ -1,21 +1,12 @@
 package com.adaptris.kafka;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import com.adaptris.core.StandaloneConsumer;
 import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.KeyValuePairSet;
 
 public class KafkaConsumerAdvancedTest extends KafkaConsumerSimpleTest {
-
-  private static Logger log = LoggerFactory.getLogger(KafkaConsumerAdvancedTest.class);
-
-
-  @Override
-  public boolean isAnnotatedForJunit4() {
-    return true;
-  }
 
   @Override
   protected String createBaseFileName(Object object) {

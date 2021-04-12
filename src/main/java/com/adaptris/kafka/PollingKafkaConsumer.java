@@ -5,28 +5,31 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
+
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
-import com.adaptris.validation.constraints.ConfigDeprecated;
+import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisPollingConsumer;
-import com.adaptris.core.ConsumeDestination;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.NullConnection;
 import com.adaptris.core.util.Args;
 import com.adaptris.core.util.DestinationHelper;
 import com.adaptris.core.util.ExceptionHelper;
-import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.util.TimeInterval;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,7 +44,7 @@ import lombok.Setter;
 @XStreamAlias("polling-apache-kafka-consumer")
 @ComponentProfile(summary = "Receive messages via Apache Kafka", tag = "consumer,kafka", recommended = {NullConnection.class})
 @DisplayOrder(
-    order = {"topics", "destination", "consumerConfig", "receiveTimeout", "additionalDebug"})
+    order = { "topics", "consumerConfig", "receiveTimeout", "additionalDebug" })
 public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements LoggingContext {
 
   private static final TimeInterval DEFAULT_RECV_TIMEOUT_INTERVAL = new TimeInterval(2L, TimeUnit.SECONDS);
@@ -49,31 +52,41 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
   @NotNull
   @Valid
   private ConsumerConfigBuilder consumerConfig;
-  @AdvancedConfig
-  private TimeInterval receiveTimeout;
-  @AdvancedConfig
-  private Boolean additionalDebug;
 
   /**
-   * The consume destination contains the topics we want to consume from.
+   * Set the receive timeout.
    *
+   * @param rt
+   *          the receive timout.
    */
+  @AdvancedConfig
+  @InputFieldDefault("2 seconds")
   @Getter
   @Setter
-  @Deprecated
-  @Valid
-  @ConfigDeprecated(removalVersion = "4.0.0", message = "Use 'topics' instead", groups = Deprecated.class)
-  private ConsumeDestination destination;
+  private TimeInterval receiveTimeout;
+
+  /**
+   * Whether or not to log all stacktraces.
+   *
+   * @param b
+   *          the logAllExceptions to set, default false
+   * @return the logAllExceptions
+   *
+   */
+  @AdvancedConfig
+  @InputFieldDefault("false")
+  @Getter
+  @Setter
+  private Boolean additionalDebug;
 
   /**
    * A comma separated list of topics that you want to consume from.
    *
    */
+  @NotBlank
   @Getter
   @Setter
-  // Needs to be @NotBlank when destination is removed.
   private String topics;
-  private transient boolean destinationWarningLogged;
 
   private transient KafkaConsumer<String, AdaptrisMessage> consumer;
 
@@ -159,28 +172,8 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
         DEFAULT_RECV_TIMEOUT_INTERVAL);
   }
 
-  public TimeInterval getReceiveTimeout() {
-    return receiveTimeout;
-  }
-
   KafkaConsumer<String, AdaptrisMessage> createConsumer(Map<String, Object> config) {
-    return new KafkaConsumer<String, AdaptrisMessage>(config);
-  }
-
-  /**
-   * @return the logAllExceptions
-   */
-  public Boolean getAdditionalDebug() {
-    return additionalDebug;
-  }
-
-  /**
-   * Whether or not to log all stacktraces.
-   *
-   * @param b the logAllExceptions to set, default false
-   */
-  public void setAdditionalDebug(Boolean b) {
-    additionalDebug = b;
+    return new KafkaConsumer<>(config);
   }
 
   @Override
@@ -193,15 +186,6 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
     return log;
   }
 
-  /**
-   * Set the receive timeout.
-   *
-   * @param rt the receive timout.
-   */
-  public void setReceiveTimeout(TimeInterval rt) {
-    receiveTimeout = rt;
-  }
-
   public PollingKafkaConsumer withTopics(String s) {
     setTopics(s);
     return this;
@@ -209,19 +193,16 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
 
   @Override
   protected void prepareConsumer() throws CoreException {
-    DestinationHelper.logWarningIfNotNull(destinationWarningLogged,
-        () -> destinationWarningLogged = true, getDestination(),
-        "{} uses destination, use topics instead", LoggingHelper.friendlyName(this));
-    DestinationHelper.mustHaveEither(getTopics(), getDestination());
+    Args.notNull(getTopics(), "topics");
   }
 
   private String topics() {
-    return DestinationHelper.consumeDestination(getTopics(), getDestination());
+    return getTopics();
   }
 
   @Override
   protected String newThreadName() {
-    return DestinationHelper.threadName(retrieveAdaptrisMessageListener(), getDestination());
+    return DestinationHelper.threadName(retrieveAdaptrisMessageListener());
   }
 
 }

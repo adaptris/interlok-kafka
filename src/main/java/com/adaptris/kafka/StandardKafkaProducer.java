@@ -1,27 +1,26 @@
 package com.adaptris.kafka;
 
 import java.util.Map;
-import javax.validation.Valid;
+
 import javax.validation.constraints.NotBlank;
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldHint;
-import com.adaptris.validation.constraints.ConfigDeprecated;
 import com.adaptris.core.AdaptrisConnection;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
-import com.adaptris.core.ProduceDestination;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.ProduceOnlyProducerImp;
 import com.adaptris.core.util.Args;
-import com.adaptris.core.util.DestinationHelper;
 import com.adaptris.core.util.ExceptionHelper;
-import com.adaptris.core.util.LoggingHelper;
 import com.adaptris.kafka.ConfigDefinition.FilterKeys;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,7 +35,7 @@ import lombok.Setter;
  */
 @XStreamAlias("standard-apache-kafka-producer")
 @ComponentProfile(summary = "Deliver messages via Apache Kafka", tag = "producer,kafka", recommended = {KafkaConnection.class})
-@DisplayOrder(order = {"recordKey"})
+@DisplayOrder(order = { "topic", "recordKey" })
 public class StandardKafkaProducer extends ProduceOnlyProducerImp {
 
   @NotBlank
@@ -47,27 +46,14 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   private ProducerConfigBuilder producerConfig;
 
   /**
-   * The destination represents the Kafka Topic to produce to
+   * The Kafka Topic to produce to
    *
    */
-  @Getter
-  @Setter
-  @Deprecated
-  @Valid
-  @ConfigDeprecated(removalVersion = "4.0.0", message = "Use 'topic' instead", groups = Deprecated.class)
-  private ProduceDestination destination;
-
-  /**
-   * The Kafka Topic
-   *
-   */
+  @NotBlank
   @InputFieldHint(expression = true)
   @Getter
   @Setter
-  // Needs to be @NotBlank when destination is removed.
   private String topic;
-
-  private transient boolean destWarning;
 
   protected transient KafkaProducer<String, AdaptrisMessage> producer;
   protected transient boolean configFromConnection;
@@ -122,9 +108,7 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
 
   @Override
   public void prepare() throws CoreException {
-    DestinationHelper.logWarningIfNotNull(destWarning, () -> destWarning = true, getDestination(),
-        "{} uses destination, use 'topic' instead", LoggingHelper.friendlyName(this));
-    DestinationHelper.mustHaveEither(getTopic(), getDestination());
+    Args.notNull(getTopic(), "topic");
   }
 
   @Override
@@ -147,12 +131,12 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   }
 
   protected KafkaProducer<String, AdaptrisMessage> createProducer(Map<String, Object> config) {
-    return new KafkaProducer<String, AdaptrisMessage>(config);
+    return new KafkaProducer<>(config);
   }
 
   protected ProducerRecord<String, AdaptrisMessage> createProducerRecord(String topic, String key, AdaptrisMessage msg) {
     log.trace("Sending message [{}] to topic [{}] with key [{}]", msg.getUniqueId(), topic, key);
-    return new ProducerRecord<String, AdaptrisMessage>(topic, key, msg);
+    return new ProducerRecord<>(topic, key, msg);
   }
 
   /**
@@ -197,6 +181,6 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
 
   @Override
   public String endpoint(AdaptrisMessage msg) throws ProduceException {
-    return DestinationHelper.resolveProduceDestination(getTopic(), getDestination(), msg);
+    return msg.resolve(getTopic());
   }
 }

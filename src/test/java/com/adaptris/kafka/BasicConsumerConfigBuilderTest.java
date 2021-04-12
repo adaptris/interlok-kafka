@@ -29,7 +29,6 @@ public class BasicConsumerConfigBuilderTest {
 
   }
 
-
   @Test
   public void testGroupId() {
     BasicConsumerConfigBuilder builder = new BasicConsumerConfigBuilder();
@@ -50,4 +49,5 @@ public class BasicConsumerConfigBuilderTest {
     assertEquals(AdaptrisMessageDeserializer.class.getName(), p.get(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG));
     assertNull(p.get(ConsumerConfig.GROUP_ID_CONFIG));
   }
+
 }

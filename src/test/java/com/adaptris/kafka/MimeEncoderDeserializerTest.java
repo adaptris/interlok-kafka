@@ -37,7 +37,7 @@ public class MimeEncoderDeserializerTest {
     Map<String, Object> config = new HashMap<>();
     config.put(ConfigBuilder.KEY_DESERIALIZER_FACTORY_CONFIG, new DefaultMessageFactory());
     s.configure(config, false);
-    AdaptrisMessage m = s.deserialize(testName.getMethodName(), "Hello World".getBytes());
+    s.deserialize(testName.getMethodName(), "Hello World".getBytes());
   }
 
 }
