@@ -137,7 +137,7 @@ dependencies {
     // dependabot will sort us out...
     exclude group: "io.netty"
   }
-  api ("com.fasterxml.jackson.core:jackson-databind:2.12.4")
+  api ("com.fasterxml.jackson.core:jackson-databind:2.12.5")
   api ("commons-collections:commons-collections:3.2.2")
 
   // Minimal netty specification
