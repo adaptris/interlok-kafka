@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
 
+import lombok.NonNull;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 
@@ -49,6 +50,7 @@ public class BasicConsumerConfigBuilder extends ConfigBuilderImpl implements Con
    *          the bootstrap servers
    */
   @NotBlank
+  @NonNull
   @Getter
   @Setter
   private String bootstrapServers;

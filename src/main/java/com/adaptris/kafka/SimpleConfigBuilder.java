@@ -1,15 +1,5 @@
 package com.adaptris.kafka;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-
-import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.producer.ProducerConfig;
-
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.CoreException;
@@ -17,9 +7,16 @@ import com.adaptris.core.util.Args;
 import com.adaptris.core.util.ExceptionHelper;
 import com.adaptris.kafka.ConfigDefinition.FilterKeys;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-
+import java.util.HashMap;
+import java.util.Map;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
+import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.producer.ProducerConfig;
 
 /**
  * Simple implementation of {@link ConfigBuilder} for use with {@link KafkaConnection}.
@@ -57,6 +54,7 @@ public class SimpleConfigBuilder extends ConfigBuilderImpl {
   @NotBlank
   @Getter
   @Setter
+  @NonNull
   private String bootstrapServers;
 
   /**
@@ -102,7 +100,7 @@ public class SimpleConfigBuilder extends ConfigBuilderImpl {
    * batching means better compression).
    * </p>
    *
-   * @param t
+   * @param compressionType
    *          the compression type
    */
   @AdvancedConfig
