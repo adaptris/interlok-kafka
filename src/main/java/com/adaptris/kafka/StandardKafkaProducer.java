@@ -48,6 +48,7 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   /**
    * The Kafka Topic to produce to
    *
+   * @paran topic
    */
   @NotBlank
   @InputFieldHint(expression = true)

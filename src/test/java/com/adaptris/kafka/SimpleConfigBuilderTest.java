@@ -27,7 +27,7 @@ public class SimpleConfigBuilderTest {
     try {
       builder.setBootstrapServers(null);
       fail();
-    } catch (IllegalArgumentException expected) {
+    } catch (RuntimeException expected) {
 
     }
     assertEquals("localhost:4242", builder.getBootstrapServers());

@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.hibernate.validator.constraints.NotBlank;
 
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.DisplayOrder;
@@ -17,13 +17,13 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Basic implementation of {@link ProducerConfigBuilder}.
- * 
+ *
  * <p>
  * Only "high" importance properties from <a href="http://kafka.apache.org/documentation.html#producerconfigs">the Apache Kafka
  * Producer Config Documentation</a> are exposed; all other properties are left as default. The {@code key.serializer} property is
  * fixed to be a {@code StringSerializer}; and the {@code value.serializer} property is always an {@link AdaptrisMessageSerializer}.
  * </p>
- * 
+ *
  * @author lchan
  * @config kafka-basic-producer-config
  * @deprecated since 3.8.0 when using a {@link KafkaConnection}; has no meaning.
@@ -74,7 +74,7 @@ public class BasicProducerConfigBuilder implements ProducerConfigBuilder {
       props.keySet().retainAll(filter.retainKeys());
     } catch (
 
-    IllegalArgumentException e) {
+        IllegalArgumentException e) {
       throw ExceptionHelper.wrapCoreException(e);
     }
     return props;
@@ -95,11 +95,11 @@ public class BasicProducerConfigBuilder implements ProducerConfigBuilder {
    * just used for the initial connection to discover the full cluster membership (which may change dynamically), this list need not
    * contain the full set of servers (you may want more than one, though, in case a server is down).
    * </p>
-   * 
+   *
    * @param s the bootstrap servers
    */
   public void setBootstrapServers(String s) {
-    this.bootstrapServers = Args.notBlank(s, "bootstrap-servers");
+    bootstrapServers = Args.notBlank(s, "bootstrap-servers");
   }
 
   public Long getBufferMemory() {
@@ -122,11 +122,11 @@ public class BasicProducerConfigBuilder implements ProducerConfigBuilder {
    * the producer uses is used for buffering. Some additional memory will be used for compression (if compression is enabled) as
    * well as for maintaining in-flight requests.
    * </p>
-   * 
+   *
    * @param m the buffer memory; default is 33554432L if not specified.
    */
   public void setBufferMemory(Long m) {
-    this.bufferMemory = m;
+    bufferMemory = m;
   }
 
 
@@ -141,11 +141,11 @@ public class BasicProducerConfigBuilder implements ProducerConfigBuilder {
    * gzip, snappy, or lz4. Compression is of full batches of data, so the efficacy of batching will also impact the compression
    * ratio (more batching means better compression).
    * </p>
-   * 
+   *
    * @param t the compression type; default is {@link ConfigBuilder.CompressionType#none} if not specified.
    */
   public void setCompressionType(CompressionType t) {
-    this.compressionType = t;
+    compressionType = t;
   }
 
 
@@ -166,11 +166,11 @@ public class BasicProducerConfigBuilder implements ProducerConfigBuilder {
    * will potentially change the ordering of records because if two records are sent to a single partition, and the first fails and
    * is retried but the second succeeds, then the second record may appear first.
    * </p>
-   * 
+   *
    * @param i the number of retries, default is 0 if not specified.
    */
   public void setRetries(Integer i) {
-    this.retries = i;
+    retries = i;
   }
 
   int retries() {
@@ -184,16 +184,16 @@ public class BasicProducerConfigBuilder implements ProducerConfigBuilder {
 
   /**
    * Set the {@code acks} property.
-   * 
+   *
    * <p>
    * This specifies number of acknowledgments the producer requires the leader to have received before considering a request
    * complete
    * </p>
-   * 
+   *
    * @param a the number of acks; default is {@link ConfigBuilder.Acks#all} if not specified for the strongest available guarantee.
    */
   public void setAcks(Acks a) {
-    this.acks = a;
+    acks = a;
   }
 
   String acks() {
