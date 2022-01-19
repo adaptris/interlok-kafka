@@ -10,13 +10,16 @@ import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.NoOpConnection;
-import com.adaptris.core.util.Args;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 /**
  * Wraps the {@code Map<String,Object>} object used to create {@code KafkaConsumer} {@code KafkaProducer} instances.
- * 
- * 
+ *
+ *
  * @author lchan
  * @config apache-kafka-connection
  *
@@ -32,6 +35,9 @@ public class KafkaConnection extends NoOpConnection {
   @AutoPopulated
   @Valid
   @NotNull
+  @NonNull
+  @Getter
+  @Setter
   private ConfigBuilder configBuilder;
 
   public KafkaConnection() {
@@ -41,14 +47,6 @@ public class KafkaConnection extends NoOpConnection {
   public KafkaConnection(ConfigBuilder builder) {
     this();
     setConfigBuilder(builder);
-  }
-
-  public ConfigBuilder getConfigBuilder() {
-    return configBuilder;
-  }
-
-  public void setConfigBuilder(ConfigBuilder configBuilder) {
-    this.configBuilder = Args.notNull(configBuilder, "configBuilder");
   }
 
   public Map<String, Object> buildConfig(ConfigBuilder.KeyFilter filter) throws CoreException {

@@ -20,7 +20,6 @@ public class AdaptrisMessageSerializer implements Serializer<AdaptrisMessage> {
   public AdaptrisMessageSerializer() {
   }
 
-
   @Override
   public void configure(Map<String, ?> configs, boolean isKey) {}
 
