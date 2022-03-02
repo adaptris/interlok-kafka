@@ -59,10 +59,9 @@ public class StandardKafkaConsumer extends AdaptrisMessageConsumerImp implements
   /**
    * Whether or not to log all stacktraces.
    *
-   * @param b
-   *          the logAllExceptions to set, default false
-   * @return the logAllExceptions
-   *
+   * @param additionalDebug,
+   *          default false
+   * @return the additionalDebug
    */
   @AdvancedConfig
   @InputFieldDefault("false")
@@ -72,6 +71,8 @@ public class StandardKafkaConsumer extends AdaptrisMessageConsumerImp implements
 
   /**
    * A comma separated list of topics that you want to consume from.
+   *
+   * @param topics
    *
    */
   @NotBlank

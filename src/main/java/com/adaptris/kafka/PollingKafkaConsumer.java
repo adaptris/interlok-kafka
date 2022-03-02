@@ -31,6 +31,7 @@ import com.adaptris.util.TimeInterval;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 /**
@@ -49,14 +50,22 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
 
   private static final TimeInterval DEFAULT_RECV_TIMEOUT_INTERVAL = new TimeInterval(2L, TimeUnit.SECONDS);
 
+  /**
+   * Configuration builder for this consumer
+   *
+   * @param consumerConfig
+   */
   @NotNull
+  @NonNull
+  @Getter
+  @Setter
   @Valid
   private ConsumerConfigBuilder consumerConfig;
 
   /**
    * Set the receive timeout.
    *
-   * @param rt
+   * @param receiveTimeout
    *          the receive timout.
    */
   @AdvancedConfig
@@ -68,10 +77,9 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
   /**
    * Whether or not to log all stacktraces.
    *
-   * @param b
-   *          the logAllExceptions to set, default false
-   * @return the logAllExceptions
-   *
+   * @param additionalDebug,
+   *          default false
+   * @return the additionalDebug
    */
   @AdvancedConfig
   @InputFieldDefault("false")
@@ -82,6 +90,7 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
   /**
    * A comma separated list of topics that you want to consume from.
    *
+   * @param topics
    */
   @NotBlank
   @Getter
@@ -157,14 +166,6 @@ public class PollingKafkaConsumer extends AdaptrisPollingConsumer implements Log
     }
 
     return proc;
-  }
-
-  public ConsumerConfigBuilder getConsumerConfig() {
-    return consumerConfig;
-  }
-
-  public void setConsumerConfig(ConsumerConfigBuilder pc) {
-    consumerConfig = Args.notNull(pc, "consumer-config");
   }
 
   long receiveTimeoutMs() {

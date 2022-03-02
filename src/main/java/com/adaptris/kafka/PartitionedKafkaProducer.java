@@ -31,7 +31,7 @@ public class PartitionedKafkaProducer extends StandardKafkaProducer {
   /**
    * Set the partition.
    *
-   * @param s
+   * @param partition
    *          the partition; can be of the form {@code %message{key1}} to use the metadata value associated with {@code key1}. If it doesn't
    *          resolve to an Integer; then {@code null} is used.
    */
@@ -42,11 +42,9 @@ public class PartitionedKafkaProducer extends StandardKafkaProducer {
   private String partition;
 
   public PartitionedKafkaProducer() {
-    super();
   }
 
   public PartitionedKafkaProducer(String recordKey, String topic) {
-    this();
     setRecordKey(recordKey);
     setTopic(topic);
   }
@@ -62,8 +60,7 @@ public class PartitionedKafkaProducer extends StandardKafkaProducer {
     Integer result = null;
     try {
       result = NumberUtils.createInteger(s);
-    }
-    catch (NumberFormatException e) {
+    } catch (NumberFormatException nfe) {
       // if we get %message{key} - and it doesn't exist, then we'll get a NFE
       // if we get %message{key} -> key then we'll get a NFE
       // if we get %message{key} -> 0F then we'll get 15 (which might still cause problems)
