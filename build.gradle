@@ -28,7 +28,7 @@ ext {
   slf4jVersion = '1.7.36'
   kafkaVersion = '2.4.1'
   nettyVersion='4.1.74.Final'
-  mockitoVersion='4.3.1'
+  mockitoVersion='4.4.0'
 }
 
 ext.hasGraphViz = { ->
