@@ -27,8 +27,9 @@ ext {
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.36'
   kafkaVersion = '2.4.1'
-  nettyVersion='4.1.75.Final'
-  mockitoVersion='4.4.0'
+  nettyVersion = '4.1.75.Final'
+  mockitoVersion = '4.4.0'
+  jacksonVersion = '2.13.2.20220324'
 }
 
 ext.hasGraphViz = { ->
@@ -137,7 +138,9 @@ dependencies {
     // dependabot will sort us out...
     exclude group: "io.netty"
   }
-  api ("com.fasterxml.jackson.core:jackson-databind:2.13.2")
+  // Dependency to platform/BOM
+  implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
+  api ("com.fasterxml.jackson.core:jackson-databind")
   api ("commons-collections:commons-collections:3.2.2")
 
   // Minimal netty specification
