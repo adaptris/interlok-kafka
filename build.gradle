@@ -137,11 +137,15 @@ dependencies {
     // we exclude netty, and force the fixed version
     // dependabot will sort us out...
     exclude group: "io.netty"
+    // CVE-2021-28165 on versions before 3.6.3
+    exclude group: "org.apache.zookeeper"
   }
   // Dependency to platform/BOM
   implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
   api ("com.fasterxml.jackson.core:jackson-databind")
   api ("commons-collections:commons-collections:3.2.2")
+  
+  implementation ("org.apache.zookeeper:zookeeper:3.6.3")
 
   // Minimal netty specification
   implementation ("io.netty:netty-handler:$nettyVersion")
