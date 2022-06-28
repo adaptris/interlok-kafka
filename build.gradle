@@ -3,13 +3,13 @@ plugins {
   id 'java-library'
   id 'maven-publish'
   id 'jacoco'
-  id 'com.github.spotbugs' version '5.0.5'
-  id 'org.owasp.dependencycheck' version '6.5.3'
-  id "io.freefair.lombok" version "6.3.0"
+  id 'com.github.spotbugs' version '5.0.7'
+  id 'org.owasp.dependencycheck' version '7.1.0.1'
+  id "io.freefair.lombok" version "6.4.3"
 }
 ext {
-  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.4-SNAPSHOT'
-  releaseVersion = project.findProperty('releaseVersion') ?: '4.4-SNAPSHOT'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.5-SNAPSHOT'
+  releaseVersion = project.findProperty('releaseVersion') ?: '4.5-SNAPSHOT'
   nexusBaseUrl = project.findProperty('nexusBaseUrl') ?: 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.findProperty('mavenPublishUrl') ?: nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -25,10 +25,11 @@ ext {
   componentDesc="Using Apache Kafka as a messaging platform"
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.35'
+  slf4jVersion = '1.7.36'
   kafkaVersion = '2.4.1'
-  nettyVersion='4.1.73.Final'
-  mockitoVersion='4.3.1'
+  nettyVersion = '4.1.77.Final'
+  mockitoVersion = '4.5.1'
+  jacksonVersion = '2.13.3'
 }
 
 ext.hasGraphViz = { ->
@@ -136,9 +137,15 @@ dependencies {
     // we exclude netty, and force the fixed version
     // dependabot will sort us out...
     exclude group: "io.netty"
+    // CVE-2021-28165 on versions before 3.6.3
+    exclude group: "org.apache.zookeeper"
   }
-  api ("com.fasterxml.jackson.core:jackson-databind:2.13.1")
+  // Dependency to platform/BOM
+  implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
+  api ("com.fasterxml.jackson.core:jackson-databind")
   api ("commons-collections:commons-collections:3.2.2")
+  
+  implementation ("org.apache.zookeeper:zookeeper:3.8.0")
 
   // Minimal netty specification
   implementation ("io.netty:netty-handler:$nettyVersion")
@@ -154,7 +161,7 @@ dependencies {
   testImplementation ("org.mockito:mockito-core:$mockitoVersion")
   testImplementation ("org.mockito:mockito-inline:$mockitoVersion")
 
-  testImplementation ("com.salesforce.kafka.test:kafka-junit4:3.2.3")
+  testImplementation ("com.salesforce.kafka.test:kafka-junit4:3.2.4")
   javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-common:$interlokCoreVersion:javadoc@jar") { changing= true}
