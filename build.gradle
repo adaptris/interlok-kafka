@@ -3,13 +3,13 @@ plugins {
   id 'java-library'
   id 'maven-publish'
   id 'jacoco'
-  id 'com.github.spotbugs' version '5.0.7'
-  id 'org.owasp.dependencycheck' version '7.1.0.1'
-  id "io.freefair.lombok" version "6.4.3"
+  id 'com.github.spotbugs' version '5.0.12'
+  id 'org.owasp.dependencycheck' version '7.2.1'
+  id "io.freefair.lombok" version "6.5.1"
 }
 ext {
-  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.5-SNAPSHOT'
-  releaseVersion = project.findProperty('releaseVersion') ?: '4.5-SNAPSHOT'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.6-SNAPSHOT'
+  releaseVersion = project.findProperty('releaseVersion') ?: '4.6-SNAPSHOT'
   nexusBaseUrl = project.findProperty('nexusBaseUrl') ?: 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.findProperty('mavenPublishUrl') ?: nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -25,11 +25,11 @@ ext {
   componentDesc="Using Apache Kafka as a messaging platform"
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.36'
+  slf4jVersion = '2.0.3'
   kafkaVersion = '2.4.1'
-  nettyVersion = '4.1.77.Final'
-  mockitoVersion = '4.5.1'
-  jacksonVersion = '2.13.3'
+  nettyVersion = '4.1.84.Final'
+  mockitoVersion = '4.8.0'
+  jacksonVersion = '2.13.4.20221013'
 }
 
 ext.hasGraphViz = { ->
