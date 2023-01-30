@@ -28,7 +28,7 @@ ext {
   slf4jVersion = '2.0.3'
   kafkaVersion = '2.4.1'
   nettyVersion = '4.1.87.Final'
-  mockitoVersion = '4.9.0'
+  mockitoVersion = '5.1.0'
   jacksonVersion = '2.14.1'
 }
 
