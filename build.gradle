@@ -3,13 +3,13 @@ plugins {
   id 'java-library'
   id 'maven-publish'
   id 'jacoco'
-  id 'com.github.spotbugs' version '5.0.12'
-  id 'org.owasp.dependencycheck' version '7.2.1'
+  id 'com.github.spotbugs' version '5.0.13'
+  id 'org.owasp.dependencycheck' version '7.4.4'
   id "io.freefair.lombok" version "6.5.1"
 }
 ext {
-  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.6-SNAPSHOT'
-  releaseVersion = project.findProperty('releaseVersion') ?: '4.6-SNAPSHOT'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.7-SNAPSHOT'
+  releaseVersion = project.findProperty('releaseVersion') ?: '4.7-SNAPSHOT'
   nexusBaseUrl = project.findProperty('nexusBaseUrl') ?: 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.findProperty('mavenPublishUrl') ?: nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -27,9 +27,9 @@ ext {
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '2.0.3'
   kafkaVersion = '2.4.1'
-  nettyVersion = '4.1.84.Final'
-  mockitoVersion = '4.8.0'
-  jacksonVersion = '2.13.4.20221013'
+  nettyVersion = '4.1.87.Final'
+  mockitoVersion = '4.9.0'
+  jacksonVersion = '2.14.1'
 }
 
 ext.hasGraphViz = { ->
