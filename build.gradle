@@ -29,7 +29,7 @@ ext {
   kafkaVersion = '3.4.0'
   nettyVersion = '4.1.87.Final'
   mockitoVersion = '4.9.0'
-  jacksonVersion = '2.14.1'
+  jacksonVersion = '2.14.2'
 }
 
 ext.hasGraphViz = { ->
