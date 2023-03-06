@@ -26,7 +26,7 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '2.0.3'
-  kafkaVersion = '2.4.1'
+  kafkaVersion = '3.4.0'
   nettyVersion = '4.1.87.Final'
   mockitoVersion = '4.9.0'
   jacksonVersion = '2.14.1'
@@ -132,7 +132,7 @@ dependencies {
   api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
   implementation ("org.slf4j:slf4j-api:$slf4jVersion")
   api ("org.apache.kafka:kafka-clients:$kafkaVersion")
-  api ("org.apache.kafka:kafka_2.11:$kafkaVersion") {
+  api ("org.apache.kafka:kafka_2.13:$kafkaVersion") {
     // 4.1.45.Final has a Uncontrolled Memory Allocation issue.
     // we exclude netty, and force the fixed version
     // dependabot will sort us out...
