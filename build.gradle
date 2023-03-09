@@ -146,7 +146,7 @@ dependencies {
   api ("commons-collections:commons-collections:3.2.2")
   
   implementation ("org.apache.zookeeper:zookeeper:3.8.0")
-  implementation ("cn.hutool:hutool-json:5.8.14")
+  implementation ("cn.hutool:hutool-json:5.8.15")
 
   // Minimal netty specification
   implementation ("io.netty:netty-handler:$nettyVersion")
