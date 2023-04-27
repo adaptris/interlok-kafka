@@ -3,13 +3,13 @@ plugins {
   id 'java-library'
   id 'maven-publish'
   id 'jacoco'
-  id 'com.github.spotbugs' version '5.0.13'
-  id 'org.owasp.dependencycheck' version '7.4.4'
+  id 'com.github.spotbugs' version '5.0.14'
+  id 'org.owasp.dependencycheck' version '8.2.1'
   id "io.freefair.lombok" version "6.5.1"
 }
 ext {
-  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.7-SNAPSHOT'
-  releaseVersion = project.findProperty('releaseVersion') ?: '4.7-SNAPSHOT'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '4.8-SNAPSHOT'
+  releaseVersion = project.findProperty('releaseVersion') ?: '4.8-SNAPSHOT'
   nexusBaseUrl = project.findProperty('nexusBaseUrl') ?: 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.findProperty('mavenPublishUrl') ?: nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -26,10 +26,10 @@ ext {
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '2.0.3'
-  kafkaVersion = '2.4.1'
+  kafkaVersion = '3.4.0'
   nettyVersion = '4.1.87.Final'
   mockitoVersion = '4.9.0'
-  jacksonVersion = '2.14.1'
+  jacksonVersion = '2.14.2'
 }
 
 ext.hasGraphViz = { ->
@@ -132,7 +132,7 @@ dependencies {
   api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
   implementation ("org.slf4j:slf4j-api:$slf4jVersion")
   api ("org.apache.kafka:kafka-clients:$kafkaVersion")
-  api ("org.apache.kafka:kafka_2.11:$kafkaVersion") {
+  api ("org.apache.kafka:kafka_2.13:$kafkaVersion") {
     // 4.1.45.Final has a Uncontrolled Memory Allocation issue.
     // we exclude netty, and force the fixed version
     // dependabot will sort us out...
@@ -145,7 +145,7 @@ dependencies {
   api ("com.fasterxml.jackson.core:jackson-databind")
   api ("commons-collections:commons-collections:3.2.2")
   
-  implementation ("org.apache.zookeeper:zookeeper:3.8.0")
+  implementation ("org.apache.zookeeper:zookeeper:3.8.1")
 
   // Minimal netty specification
   implementation ("io.netty:netty-handler:$nettyVersion")
@@ -161,7 +161,7 @@ dependencies {
   testImplementation ("org.mockito:mockito-core:$mockitoVersion")
   testImplementation ("org.mockito:mockito-inline:$mockitoVersion")
 
-  testImplementation ("com.salesforce.kafka.test:kafka-junit4:3.2.4")
+  testImplementation ("com.salesforce.kafka.test:kafka-junit4:3.2.5")
   javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
   offlineJavadocPackages ("com.adaptris:interlok-common:$interlokCoreVersion:javadoc@jar") { changing= true}
@@ -377,6 +377,7 @@ dependencyCheck  {
   failBuildOnCVSS = 7.0
   analyzers {
     assemblyEnabled=false
+    knownExploitedURL=project.findProperty('dependencyCheckKnownExploitedURL')
   }
 }
 // disable spotbugsTests which checks our test code..
