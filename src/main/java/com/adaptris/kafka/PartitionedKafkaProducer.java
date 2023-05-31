@@ -21,10 +21,8 @@ import lombok.Setter;
  *
  */
 @XStreamAlias("partitioned-apache-kafka-producer")
-@ComponentProfile(summary = "Produce messages to Apache Kafka with a specific partition number", tag = "producer,kafka", recommended =
-{
-    KafkaConnection.class
-})
+@ComponentProfile(summary = "Produce messages to Apache Kafka with a specific partition number", tag = "producer,kafka", recommended = {
+    KafkaConnection.class })
 @DisplayOrder(order = { "topic", "recordKey", "partition" })
 public class PartitionedKafkaProducer extends StandardKafkaProducer {
 
@@ -68,8 +66,10 @@ public class PartitionedKafkaProducer extends StandardKafkaProducer {
     return result;
   }
 
+  @SuppressWarnings("unchecked")
   public <T extends PartitionedKafkaProducer> T withPartition(String s) {
     setPartition(s);
     return (T) this;
   }
+
 }
