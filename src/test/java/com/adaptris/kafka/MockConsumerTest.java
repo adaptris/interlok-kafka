@@ -1,16 +1,16 @@
 package com.adaptris.kafka;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -18,11 +18,7 @@ import java.util.Map;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.Test;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
@@ -32,19 +28,7 @@ import com.adaptris.core.stubs.MockMessageListener;
 import com.adaptris.core.util.LifecycleHelper;
 import com.adaptris.interlok.junit.scaffolding.BaseCase;
 
-@SuppressWarnings("deprecation")
-public class MockConsumerTest {
-
-  @Rule
-  public TestName testName = new TestName();
-
-  @BeforeClass
-  public static void setUpClass() throws Exception {
-  }
-
-  @AfterClass
-  public static void tearDownClass() {
-  }
+public class MockConsumerTest extends BaseTestClass {
 
   @Test
   public void testLoggingContext() {
@@ -58,11 +42,10 @@ public class MockConsumerTest {
 
   @Test
   public void testLifecycle() throws Exception {
-    final String text = testName.getMethodName();
+    final String text = getName();
     final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mock(KafkaConsumer.class);
     ConsumerRecords<String, AdaptrisMessage> records = mock(ConsumerRecords.class);
-    StandardKafkaConsumer consumer =
-        new StandardKafkaConsumer() {
+    StandardKafkaConsumer consumer = new StandardKafkaConsumer() {
       @Override
       KafkaConsumer<String, AdaptrisMessage> createConsumer(Map<String, Object> config) {
         return kafkaConsumer;
@@ -73,7 +56,7 @@ public class MockConsumerTest {
 
     when(records.count()).thenReturn(0);
     when(records.iterator()).thenReturn(new ArrayList<ConsumerRecord<String, AdaptrisMessage>>().iterator());
-    when(kafkaConsumer.poll(anyLong())).thenReturn(records);
+    when(kafkaConsumer.poll(any(Duration.class))).thenReturn(records);
     when(kafkaConsumer.poll(any())).thenReturn(records);
     StandaloneConsumer sc = new StandaloneConsumer(new KafkaConnection(new SimpleConfigBuilder("localhost:4242")), consumer);
     try {
@@ -86,11 +69,10 @@ public class MockConsumerTest {
 
   @Test
   public void testLifecycle_WithException() throws Exception {
-    final String text = testName.getMethodName();
+    final String text = getName();
     final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mock(KafkaConsumer.class);
     ConsumerRecords<String, AdaptrisMessage> records = mock(ConsumerRecords.class);
-    StandardKafkaConsumer consumer =
-        new StandardKafkaConsumer() {
+    StandardKafkaConsumer consumer = new StandardKafkaConsumer() {
       @Override
       KafkaConsumer<String, AdaptrisMessage> createConsumer(Map<String, Object> config) {
         throw new RuntimeException(text);
@@ -99,7 +81,7 @@ public class MockConsumerTest {
     consumer.withTopics(text);
     when(records.count()).thenReturn(0);
     when(records.iterator()).thenReturn(new ArrayList<ConsumerRecord<String, AdaptrisMessage>>().iterator());
-    when(kafkaConsumer.poll(anyLong())).thenReturn(records);
+    when(kafkaConsumer.poll(any(Duration.class))).thenReturn(records);
     when(kafkaConsumer.poll(any())).thenReturn(records);
     StandaloneConsumer sc = new StandaloneConsumer(new KafkaConnection(new SimpleConfigBuilder("localhost:4242")), consumer);
     try {
@@ -112,10 +94,9 @@ public class MockConsumerTest {
     }
   }
 
-
   @Test
   public void testConsume() throws Exception {
-    final String text = testName.getMethodName();
+    final String text = getName();
     final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mock(KafkaConsumer.class);
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(text);
 
@@ -131,9 +112,8 @@ public class MockConsumerTest {
 
     consumer.withTopics(text);
     when(records.count()).thenReturn(1);
-    when(records.iterator())
-    .thenReturn(new ArrayList<>(Arrays.asList(record)).iterator());
-    when(kafkaConsumer.poll(anyLong())).thenReturn(records);
+    when(records.iterator()).thenReturn(new ArrayList<>(Arrays.asList(record)).iterator());
+    when(kafkaConsumer.poll(any(Duration.class))).thenReturn(records);
     when(kafkaConsumer.poll(any())).thenReturn(records);
     StandaloneConsumer sc = new StandaloneConsumer(new KafkaConnection(new SimpleConfigBuilder("localhost:4242")), consumer);
     MockMessageListener mock = new MockMessageListener();
@@ -147,9 +127,7 @@ public class MockConsumerTest {
       assertEquals(text, consumed.getContent());
     } finally {
       LifecycleHelper.stopAndClose(sc);
-
     }
   }
-
 
 }

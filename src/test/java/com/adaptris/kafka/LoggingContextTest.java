@@ -9,9 +9,7 @@ import java.util.List;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.Node;
 import org.apache.kafka.common.PartitionInfo;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +20,6 @@ public class LoggingContextTest {
 
   private Logger log = LoggerFactory.getLogger(this.getClass());
 
-  @Rule
-  public TestName testName = new TestName();
   @Test
   public void testLogPartitions() {
     final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mock(KafkaConsumer.class);
@@ -35,9 +31,11 @@ public class LoggingContextTest {
 
   private class LoggingContextImpl implements LoggingContext {
     private boolean debug;
+
     LoggingContextImpl(boolean additionalDebug) {
       debug = additionalDebug;
     }
+
     @Override
     public boolean additionalDebug() {
       return debug;
@@ -47,7 +45,6 @@ public class LoggingContextTest {
     public Logger logger() {
       return log;
     }
-
   }
 
 }
