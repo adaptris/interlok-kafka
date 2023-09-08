@@ -43,7 +43,7 @@ public class MockConsumerTest extends BaseTestClass {
   @Test
   public void testLifecycle() throws Exception {
     final String text = getName();
-    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mock(KafkaConsumer.class);
+    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mockKafkaConsumer();
     ConsumerRecords<String, AdaptrisMessage> records = mock(ConsumerRecords.class);
     StandardKafkaConsumer consumer = new StandardKafkaConsumer() {
       @Override
@@ -70,7 +70,7 @@ public class MockConsumerTest extends BaseTestClass {
   @Test
   public void testLifecycle_WithException() throws Exception {
     final String text = getName();
-    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mock(KafkaConsumer.class);
+    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mockKafkaConsumer();
     ConsumerRecords<String, AdaptrisMessage> records = mock(ConsumerRecords.class);
     StandardKafkaConsumer consumer = new StandardKafkaConsumer() {
       @Override
@@ -97,7 +97,7 @@ public class MockConsumerTest extends BaseTestClass {
   @Test
   public void testConsume() throws Exception {
     final String text = getName();
-    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mock(KafkaConsumer.class);
+    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mockKafkaConsumer();
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(text);
 
     ConsumerRecords<String, AdaptrisMessage> records = mock(ConsumerRecords.class);
@@ -128,6 +128,10 @@ public class MockConsumerTest extends BaseTestClass {
     } finally {
       LifecycleHelper.stopAndClose(sc);
     }
+  }
+
+  private KafkaConsumer<String, AdaptrisMessage> mockKafkaConsumer() {
+    return mock(KafkaConsumer.class);
   }
 
 }
