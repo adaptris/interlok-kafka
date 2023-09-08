@@ -57,7 +57,7 @@ public class MockPollingConsumerTest extends BaseTestClass {
   @Test
   public void testLifecycle() throws Exception {
     final String text = getName();
-    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mock(KafkaConsumer.class);
+    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mockKafkaConsumer();
     ConsumerRecords<String, AdaptrisMessage> records = mock(ConsumerRecords.class);
     PollingKafkaConsumer consumer = new PollingKafkaConsumer(new BasicConsumerConfigBuilder("localhost:2342")) {
       @Override
@@ -83,7 +83,7 @@ public class MockPollingConsumerTest extends BaseTestClass {
   @Test
   public void testLifecycle_WithException() throws Exception {
     final String text = getName();
-    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mock(KafkaConsumer.class);
+    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mockKafkaConsumer();
     ConsumerRecords<String, AdaptrisMessage> records = mock(ConsumerRecords.class);
     PollingKafkaConsumer consumer = new PollingKafkaConsumer(new BasicConsumerConfigBuilder("localhost:2342")) {
       @Override
@@ -113,7 +113,7 @@ public class MockPollingConsumerTest extends BaseTestClass {
   @Test
   public void testConsume() throws Exception {
     final String text = getName();
-    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mock(KafkaConsumer.class);
+    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mockKafkaConsumer();
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(text);
 
     ConsumerRecords<String, AdaptrisMessage> records = mock(ConsumerRecords.class);
@@ -151,7 +151,7 @@ public class MockPollingConsumerTest extends BaseTestClass {
   @Test
   public void testConsume_WithGroupId() throws Exception {
     final String text = getName();
-    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mock(KafkaConsumer.class);
+    final KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mockKafkaConsumer();
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(text);
 
     ConsumerRecords<String, AdaptrisMessage> records = mock(ConsumerRecords.class);
@@ -185,6 +185,10 @@ public class MockPollingConsumerTest extends BaseTestClass {
       LifecycleHelper.stop(sc);
       LifecycleHelper.close(sc);
     }
+  }
+
+  private KafkaConsumer<String, AdaptrisMessage> mockKafkaConsumer() {
+    return mock(KafkaConsumer.class);
   }
 
 }
