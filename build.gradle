@@ -145,7 +145,7 @@ dependencies {
   api ("com.fasterxml.jackson.core:jackson-databind")
   api ("commons-collections:commons-collections:3.2.2")
   
-  implementation ("org.apache.zookeeper:zookeeper:3.9.0")
+  implementation ("org.apache.zookeeper:zookeeper:3.9.1")
 
   // Minimal netty specification
   implementation ("io.netty:netty-handler:$nettyVersion")
