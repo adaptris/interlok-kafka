@@ -7,7 +7,6 @@ import javax.validation.constraints.NotBlank;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.annotation.InputFieldHint;
@@ -34,16 +33,13 @@ import lombok.Setter;
  *
  */
 @XStreamAlias("standard-apache-kafka-producer")
-@ComponentProfile(summary = "Deliver messages via Apache Kafka", tag = "producer,kafka", recommended = {KafkaConnection.class})
+@ComponentProfile(summary = "Deliver messages via Apache Kafka", tag = "producer,kafka", recommended = { KafkaConnection.class })
 @DisplayOrder(order = { "topic", "recordKey" })
 public class StandardKafkaProducer extends ProduceOnlyProducerImp {
 
   @NotBlank
   @InputFieldHint(expression = true)
   private String recordKey;
-  @Deprecated
-  @AdvancedConfig
-  private ProducerConfigBuilder producerConfig;
 
   /**
    * The Kafka Topic to produce to
@@ -57,7 +53,6 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   private String topic;
 
   protected transient KafkaProducer<String, AdaptrisMessage> producer;
-  protected transient boolean configFromConnection;
 
   public StandardKafkaProducer() {
   }
@@ -67,20 +62,11 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
     setTopic(topic);
   }
 
-  @Deprecated
-  StandardKafkaProducer(String recordKey, String topic, ProducerConfigBuilder b) {
-    this();
-    setRecordKey(recordKey);
-    setTopic(topic);
-    setProducerConfig(b);
-  }
-
   @Override
   public void init() throws CoreException {
     try {
       Args.notBlank(getRecordKey(), "record-key");
-    }
-    catch (IllegalArgumentException e) {
+    } catch (IllegalArgumentException e) {
       throw ExceptionHelper.wrapCoreException(e);
     }
     producer = null;
@@ -105,7 +91,8 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   }
 
   @Override
-  public void close() {}
+  public void close() {
+  }
 
   @Override
   public void prepare() throws CoreException {
@@ -113,8 +100,7 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   }
 
   @Override
-  protected void doProduce(AdaptrisMessage msg, String topic)
-      throws ProduceException {
+  protected void doProduce(AdaptrisMessage msg, String topic) throws ProduceException {
     try {
       String key = msg.resolve(getRecordKey());
       producer.send(createProducerRecord(topic, key, msg));
@@ -124,11 +110,7 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   }
 
   private Map<String, Object> buildConfig() throws CoreException {
-    if (configFromConnection) {
-      return retrieveConnection(KafkaConnection.class).buildConfig(FilterKeys.Producer);
-    }
-    log.warn("producer-config is deprecated); use a {} instead", KafkaConnection.class.getSimpleName());
-    return getProducerConfig().build();
+    return retrieveConnection(KafkaConnection.class).buildConfig(FilterKeys.Producer);
   }
 
   protected KafkaProducer<String, AdaptrisMessage> createProducer(Map<String, Object> config) {
@@ -138,24 +120,6 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   protected ProducerRecord<String, AdaptrisMessage> createProducerRecord(String topic, String key, AdaptrisMessage msg) {
     log.trace("Sending message [{}] to topic [{}] with key [{}]", msg.getUniqueId(), topic, key);
     return new ProducerRecord<>(topic, key, msg);
-  }
-
-  /**
-   *
-   * @deprecated since 3.7.0 use a {@link KafkaConnection} instead.
-   */
-  @Deprecated
-  public ProducerConfigBuilder getProducerConfig() {
-    return producerConfig;
-  }
-
-  /**
-   *
-   * @deprecated since 3.7.0 use a {@link KafkaConnection} instead.
-   */
-  @Deprecated
-  public void setProducerConfig(ProducerConfigBuilder pc) {
-    producerConfig = pc;
   }
 
   public String getRecordKey() {
@@ -174,10 +138,6 @@ public class StandardKafkaProducer extends ProduceOnlyProducerImp {
   @Override
   public void registerConnection(AdaptrisConnection conn) {
     super.registerConnection(conn);
-    if (conn instanceof KafkaConnection) {
-      configFromConnection = true;
-    }
-
   }
 
   @Override

@@ -1,17 +1,15 @@
 package com.adaptris.kafka;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Set;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
@@ -28,25 +26,20 @@ import com.adaptris.interlok.junit.scaffolding.BaseCase;
 import com.adaptris.interlok.junit.scaffolding.services.ExampleServiceCase;
 import com.adaptris.kafka.ConfigBuilder.Acks;
 import com.adaptris.util.KeyValuePair;
-import com.salesforce.kafka.test.junit4.SharedKafkaTestResource;
+import com.salesforce.kafka.test.junit5.SharedKafkaTestResource;
 
-public class InlineKafkaCase {
+public class InlineKafkaCase extends BaseTestClass {
 
-  @Rule
-  public TestName testName = new TestName();
-
-  @ClassRule
-  public static final SharedKafkaTestResource INLINE_KAFKA =
-  new SharedKafkaTestResource().withBrokerProperty("auto.create.topics.enable", "false");
-
+  @RegisterExtension
+  public static final SharedKafkaTestResource INLINE_KAFKA = new SharedKafkaTestResource().withBrokerProperty("auto.create.topics.enable",
+      "false");
 
   @Test
   public void testStart_BadConfig() throws Exception {
-    String text = testName.getMethodName();
+    String text = getName();
     // No BootstrapServer, so we're duff.
     AdvancedConfigBuilder builder = new AdvancedConfigBuilder();
-    StandaloneProducer p = new StandaloneProducer(new KafkaConnection(builder),
-        new StandardKafkaProducer(text, text));
+    StandaloneProducer p = new StandaloneProducer(new KafkaConnection(builder), new StandardKafkaProducer(text, text));
     try {
       LifecycleHelper.init(p);
       try {
@@ -62,7 +55,7 @@ public class InlineKafkaCase {
 
   @Test
   public void testProducerLifecycle() throws Exception {
-    String text = testName.getMethodName();
+    String text = getName();
     StandaloneProducer p = createProducer(INLINE_KAFKA.getKafkaConnectString(), text, text);
     try {
       LifecycleHelper.initAndStart(p);
@@ -72,10 +65,9 @@ public class InlineKafkaCase {
     }
   }
 
-
   @Test
   public void testConsumerLifecycle() throws Exception {
-    String topicName = testName.getMethodName();
+    String topicName = getName();
     MockMessageListener mock = new MockMessageListener();
     StandaloneConsumer sc = createConsumer(INLINE_KAFKA.getKafkaConnectString(), topicName, mock);
     createTopic(topicName);
@@ -94,14 +86,13 @@ public class InlineKafkaCase {
     }
   }
 
-
   // Test doesn't appear to work, since messages aren't being delivered :(
   // @Test
   public void testSendAndReceive_Polling() throws Exception {
     StandaloneConsumer sc = null;
     StandaloneProducer sp = null;
     try {
-      String text = testName.getMethodName();
+      String text = getName();
       createTopic(text);
       sp = createProducer(INLINE_KAFKA.getKafkaConnectString(), text, text);
       MockMessageListener mock = new MockMessageListener();
@@ -117,7 +108,6 @@ public class InlineKafkaCase {
       BaseCase.stop(sc, sp);
     }
   }
-
 
   private StandaloneConsumer createConsumer(String bootstrapServer, String topic, MockMessageListener p) {
     AdvancedConsumerConfigBuilder builder = new AdvancedConsumerConfigBuilder();
@@ -160,4 +150,5 @@ public class InlineKafkaCase {
     Set<String> topics = INLINE_KAFKA.getKafkaTestUtils().getTopicNames();
     assertTrue(topics.contains(name));
   }
+
 }
