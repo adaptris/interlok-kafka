@@ -30,7 +30,7 @@ ext {
   kafkaVersion = '3.6.1'
   nettyVersion = '4.1.104.Final'
   mockitoVersion = '5.2.0'
-  jacksonVersion = '2.16.0'
+  jacksonVersion = '2.16.1'
 }
 
 // If graphviz is installed via scoop, plantuml doesn't find it because it's not
