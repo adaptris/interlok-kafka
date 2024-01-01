@@ -26,7 +26,7 @@ ext {
   componentDesc="Using Apache Kafka as a messaging platform"
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '2.0.9'
+  slf4jVersion = '2.0.10'
   kafkaVersion = '3.6.1'
   nettyVersion = '4.1.104.Final'
   mockitoVersion = '5.2.0'
