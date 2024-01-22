@@ -27,7 +27,7 @@ ext {
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '2.0.11'
   kafkaVersion = '3.6.1'
-  nettyVersion = '4.1.104.Final'
+  nettyVersion = '4.1.106.Final'
   mockitoVersion = '5.2.0'
   jacksonVersion = '2.16.1'
 }
