@@ -3,9 +3,9 @@ plugins {
   id "java-library"
   id "maven-publish"
   id "jacoco"
-  id "com.github.spotbugs" version "5.2.1"
+  id "com.github.spotbugs" version "6.0.6"
   id "org.sonarqube" version "4.4.1.3373"
-  id "org.owasp.dependencycheck" version "8.4.2"
+  id "org.owasp.dependencycheck" version "9.0.8"
   id "io.freefair.lombok" version "8.4"
 }
 ext {
@@ -26,11 +26,11 @@ ext {
   componentDesc="Using Apache Kafka as a messaging platform"
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '2.0.9'
-  kafkaVersion = '3.6.0'
-  nettyVersion = '4.1.100.Final'
+  slf4jVersion = '2.0.11'
+  kafkaVersion = '3.6.1'
+  nettyVersion = '4.1.104.Final'
   mockitoVersion = '5.2.0'
-  jacksonVersion = '2.15.3'
+  jacksonVersion = '2.16.1'
 }
 
 // If graphviz is installed via scoop, plantuml doesn't find it because it's not
@@ -154,8 +154,13 @@ dependencies {
   implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
   api ("com.fasterxml.jackson.core:jackson-databind")
   api ("commons-collections:commons-collections:3.2.2")
-  
-  implementation ("org.apache.zookeeper:zookeeper:3.9.1")
+
+  implementation ("org.apache.zookeeper:zookeeper:3.9.1") {
+    // CVE-2023-6378 on versions before 1.2.13
+    exclude group: "ch.qos.logback"
+  }
+
+  api ("ch.qos.logback:logback-classic:1.2.13")
 
   // Minimal netty specification
   implementation ("io.netty:netty-handler:$nettyVersion")
@@ -349,8 +354,8 @@ task deleteGeneratedFiles(type: Delete) {
 }
 
 spotbugsMain {
-  effort = "max"
-  reportLevel = "high"
+  effort = com.github.spotbugs.snom.Effort.valueOf("MAX")
+  reportLevel = com.github.spotbugs.snom.Confidence.valueOf("HIGH")
   reports {
     xml {
       required.set(false)
