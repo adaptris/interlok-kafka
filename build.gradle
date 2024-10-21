@@ -160,7 +160,7 @@ dependencies {
     exclude group: "ch.qos.logback"
   }
 
-  api ("ch.qos.logback:logback-classic:1.5.10")
+  api ("ch.qos.logback:logback-classic:1.5.11")
 
   // Minimal netty specification
   implementation ("io.netty:netty-handler:$nettyVersion")
