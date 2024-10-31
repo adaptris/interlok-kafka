@@ -145,7 +145,7 @@ dependencies {
   api ("com.fasterxml.jackson.core:jackson-databind")
   api ("commons-collections:commons-collections:3.2.2")
 
-  implementation ("org.apache.zookeeper:zookeeper:3.9.2") {
+  implementation ("org.apache.zookeeper:zookeeper:3.9.3") {
     // CVE-2023-6378 on versions before 1.2.13
     exclude group: "ch.qos.logback"
   }
