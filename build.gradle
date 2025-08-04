@@ -28,9 +28,9 @@ ext {
   organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '2.0.17'
   kafkaVersion = '3.9.0'
-  nettyVersion = '4.2.2.Final'
+  nettyVersion = '4.2.3.Final'
   mockitoVersion = '5.2.0'
-  jacksonVersion = '2.19.1'
+  jacksonVersion = '2.19.2'
 }
 
 // If graphviz is installed via scoop, plantuml doesn't find it because it's not
@@ -170,7 +170,7 @@ dependencies {
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
   umlDoclet("nl.talsmasoftware:umldoclet:2.1.0")
 
-  testImplementation ("org.junit.jupiter:junit-jupiter-engine:5.13.3")
+  testImplementation ("org.junit.jupiter:junit-jupiter-engine:5.13.4")
     testImplementation ("org.junit.platform:junit-platform-launcher:1.13.3")
   testImplementation ("org.slf4j:slf4j-simple:$slf4jVersion")
   testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true }
