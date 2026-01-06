@@ -149,7 +149,10 @@ dependencies {
     exclude group: "io.netty"
     // CVE-2021-28165 on versions before 3.6.3
     exclude group: "org.apache.zookeeper"
+    // CVE-2024-29371 fixed in 0.9.6
+    exclude group: "org.bitbucket.b_c"
   }
+  implementation("org.bitbucket.b_c:jose4j:0.9.6")
   // Dependency to platform/BOM
   implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
   api ("com.fasterxml.jackson.core:jackson-databind")
