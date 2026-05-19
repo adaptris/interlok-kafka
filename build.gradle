@@ -3,10 +3,10 @@ plugins {
   id "java-library"
   id "maven-publish"
   id "jacoco"
-  id "com.github.spotbugs" version "6.0.27"
-  id "org.sonarqube" version "6.0.1.5171"
-  id "org.owasp.dependencycheck" version "11.1.1"
-  id "io.freefair.lombok" version "8.11"
+  id "com.github.spotbugs" version "6.5.4"
+  id "org.sonarqube" version "6.3.1.5724"
+  id "org.owasp.dependencycheck" version "12.2.2"
+  id "io.freefair.lombok" version "8.14.2"
 }
 ext {
   interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '5.0-SNAPSHOT'
@@ -26,11 +26,12 @@ ext {
   componentDesc="Using Apache Kafka as a messaging platform"
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '2.0.16'
-  kafkaVersion = '3.9.0'
-  nettyVersion = '4.1.116.Final'
+  slf4jVersion = '2.0.17'
+  kafkaVersion = '3.9.2'
+  nettyVersion = '4.2.13.Final'
+  zookeeperVersion = '3.9.5'
   mockitoVersion = '5.2.0'
-  jacksonVersion = '2.18.2'
+  jacksonVersion = '2.21.3'
 }
 
 // If graphviz is installed via scoop, plantuml doesn't find it because it's not
@@ -149,13 +150,16 @@ dependencies {
     exclude group: "io.netty"
     // CVE-2021-28165 on versions before 3.6.3
     exclude group: "org.apache.zookeeper"
+    // CVE-2024-29371 fixed in 0.9.6
+    exclude group: "org.bitbucket.b_c"
   }
+  implementation("org.bitbucket.b_c:jose4j:0.9.6")
   // Dependency to platform/BOM
   implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
   api ("com.fasterxml.jackson.core:jackson-databind")
   api ("commons-collections:commons-collections:3.2.2")
-
-  implementation ("org.apache.zookeeper:zookeeper:3.9.3") {
+  api ("commons-beanutils:commons-beanutils:1.11.0")
+  implementation ("org.apache.zookeeper:zookeeper:$zookeeperVersion") {
     // CVE-2023-6378 on versions before 1.2.13
     exclude group: "ch.qos.logback"
   }
@@ -170,7 +174,8 @@ dependencies {
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
   umlDoclet("nl.talsmasoftware:umldoclet:2.1.0")
 
-  testImplementation ("org.junit.jupiter:junit-jupiter-engine:5.11.4")
+  testImplementation ("org.junit.jupiter:junit-jupiter-engine:5.13.4")
+    testImplementation ("org.junit.platform:junit-platform-launcher:1.13.3")
   testImplementation ("org.slf4j:slf4j-simple:$slf4jVersion")
   testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true }
   testImplementation ("org.mockito:mockito-core:$mockitoVersion")
@@ -380,7 +385,12 @@ dependencyCheck  {
   }
   analyzers {
     assemblyEnabled=false
-    knownExploitedURL=project.findProperty('dependencyCheckKnownExploitedURL')
+	ossIndex {
+    enabled = System.getenv("OSS_INDEX_USERNAME") != null && System.getenv("OSS_INDEX_PASSWORD") != null
+	  username = System.getenv("OSS_INDEX_USERNAME")
+	  password = System.getenv("OSS_INDEX_PASSWORD")
+  	  warnOnlyOnRemoteErrors = true
+    }
   }
 }
 
