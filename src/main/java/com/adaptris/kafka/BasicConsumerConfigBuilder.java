@@ -3,7 +3,7 @@ package com.adaptris.kafka;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 import lombok.NonNull;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
