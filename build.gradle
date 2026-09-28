@@ -153,7 +153,7 @@ dependencies {
     // CVE-2024-29371 fixed in 0.9.6
     exclude group: "org.bitbucket.b_c"
   }
-  implementation("org.bitbucket.b_c:jose4j:0.9.6")
+  implementation("org.bitbucket.b_c:jose4j:0.9.7")
   // Dependency to platform/BOM
   implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
   api ("com.fasterxml.jackson.core:jackson-databind")
