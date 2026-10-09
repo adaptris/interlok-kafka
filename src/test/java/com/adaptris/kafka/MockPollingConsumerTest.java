@@ -4,21 +4,28 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Field;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.errors.WakeupException;
 import org.junit.jupiter.api.Test;
 
 import com.adaptris.core.AdaptrisMessage;
@@ -32,6 +39,41 @@ import com.adaptris.interlok.junit.scaffolding.BaseCase;
 import com.adaptris.util.TimeInterval;
 
 public class MockPollingConsumerTest extends BaseTestClass {
+
+  @Test
+  public void testPollFailureRecoversWithoutAdditionalDebug() throws Exception {
+    assertPollFailureRecovers(false);
+  }
+
+  @Test
+  public void testPollFailureRecoversWithAdditionalDebug() throws Exception {
+    assertPollFailureRecovers(true);
+  }
+
+  private void assertPollFailureRecovers(boolean additionalDebug) throws Exception {
+    KafkaConsumer<String, AdaptrisMessage> kafkaConsumer = mockKafkaConsumer();
+    PollingKafkaConsumer consumer = new PollingKafkaConsumer();
+    consumer.setAdditionalDebug(additionalDebug);
+    consumer.setReceiveTimeout(new TimeInterval(25L, TimeUnit.MILLISECONDS));
+    MockMessageListener listener = new MockMessageListener();
+    consumer.registerAdaptrisMessageListener(listener);
+    Field field = PollingKafkaConsumer.class.getDeclaredField("consumer");
+    field.setAccessible(true);
+    field.set(consumer, kafkaConsumer);
+
+    AdaptrisMessage message = AdaptrisMessageFactory.getDefaultInstance().newMessage("payload");
+    ConsumerRecord<String, AdaptrisMessage> record = new ConsumerRecord<>("topic", 0, 0, "key", message);
+    ConsumerRecords<String, AdaptrisMessage> records =
+        new ConsumerRecords<>(Map.of(new TopicPartition("topic", 0), List.of(record)));
+    when(kafkaConsumer.poll(Duration.ofMillis(25))).thenThrow(new WakeupException()).thenReturn(records);
+
+    assertEquals(0, consumer.processMessages());
+    assertTrue(listener.getMessages().isEmpty());
+    assertEquals(1, consumer.processMessages());
+    assertEquals(1, listener.getMessages().size());
+    assertSame(message, listener.getMessages().get(0));
+    verify(kafkaConsumer, times(2)).poll(Duration.ofMillis(25));
+  }
 
   @Test
   public void testLoggingContext() {
