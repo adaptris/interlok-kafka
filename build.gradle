@@ -29,7 +29,7 @@ ext {
   slf4jVersion = '2.0.20'
   kafkaVersion = '3.9.2'
   nettyVersion = '4.2.18.Final'
-  zookeeperVersion = '3.9.5'
+  zookeeperVersion = '3.9.6'
   mockitoVersion = '5.2.0'
   jacksonVersion = '2.22.3'
 }
@@ -143,6 +143,17 @@ dependencies {
   api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
   implementation ("org.slf4j:slf4j-api:$slf4jVersion")
   api ("org.apache.kafka:kafka-clients:$kafkaVersion")
+  constraints {
+    implementation ("at.yawk.lz4:lz4-java:1.11.4") {
+      because 'Fix native loading, bounds checking and decompression resource exhaustion vulnerabilities'
+    }
+    implementation ("org.xerial.snappy:snappy-java:1.1.10.11") {
+      because 'Fix buffer overflow vulnerabilities in compression and decompression'
+    }
+    implementation ("com.github.luben:zstd-jni:1.5.7-22") {
+      because 'Fix native bounds checking and decompression infinite loop vulnerabilities'
+    }
+  }
   api ("org.apache.kafka:kafka_2.13:$kafkaVersion") {
     // 4.1.45.Final has a Uncontrolled Memory Allocation issue.
     // we exclude netty, and force the fixed version
@@ -164,7 +175,7 @@ dependencies {
     exclude group: "ch.qos.logback"
   }
 
-  api ("ch.qos.logback:logback-classic:1.5.16")
+  api ("ch.qos.logback:logback-classic:1.6.5")
 
   // Minimal netty specification
   implementation ("io.netty:netty-handler:$nettyVersion")
