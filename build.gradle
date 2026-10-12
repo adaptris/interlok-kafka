@@ -144,7 +144,7 @@ dependencies {
   implementation ("org.slf4j:slf4j-api:$slf4jVersion")
   api ("org.apache.kafka:kafka-clients:$kafkaVersion")
   constraints {
-    implementation ("at.yawk.lz4:lz4-java:1.11.4") {
+    implementation ("at.yawk.lz4:lz4-java:1.12.0") {
       because 'Fix native loading, bounds checking and decompression resource exhaustion vulnerabilities'
     }
     implementation ("org.xerial.snappy:snappy-java:1.1.10.11") {
