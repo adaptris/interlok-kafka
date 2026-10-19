@@ -150,7 +150,7 @@ dependencies {
     implementation ("org.xerial.snappy:snappy-java:1.1.10.11") {
       because 'Fix buffer overflow vulnerabilities in compression and decompression'
     }
-    implementation ("com.github.luben:zstd-jni:1.5.7-22") {
+    implementation ("com.github.luben:zstd-jni:1.5.7-23") {
       because 'Fix native bounds checking and decompression infinite loop vulnerabilities'
     }
   }
