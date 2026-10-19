@@ -147,7 +147,7 @@ dependencies {
     implementation ("at.yawk.lz4:lz4-java:1.11.4") {
       because 'Fix native loading, bounds checking and decompression resource exhaustion vulnerabilities'
     }
-    implementation ("org.xerial.snappy:snappy-java:1.1.10.11") {
+    implementation ("org.xerial.snappy:snappy-java:1.1.10.12") {
       because 'Fix buffer overflow vulnerabilities in compression and decompression'
     }
     implementation ("com.github.luben:zstd-jni:1.5.7-22") {
