@@ -9,8 +9,9 @@ plugins {
   id "io.freefair.lombok" version "8.14.2"
 }
 ext {
-  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: '5.0-SNAPSHOT'
-  releaseVersion = project.findProperty('releaseVersion') ?: '5.0-SNAPSHOT'
+  interlokCatalogVersion = project.findProperty('interlokCatalogVersion') ?: '5.0-SNAPSHOT'
+  interlokCoreVersion = project.findProperty('interlokCoreVersion') ?: interlokCatalogVersion
+  releaseVersion = project.findProperty('releaseVersion') ?: interlokCatalogVersion
   nexusBaseUrl = project.findProperty('nexusBaseUrl') ?: 'https://nexus.adaptris.net/nexus'
   mavenPublishUrl = project.findProperty('mavenPublishUrl') ?: nexusBaseUrl + '/content/repositories/snapshots'
   javadocsBaseUrl = nexusBaseUrl + "/content/sites/javadocs/com/adaptris"
@@ -19,6 +20,7 @@ ext {
   defaultNexusRepo = project.findProperty('defaultNexusRepo') ?: 'unknown'
   interlokJavadocs= project.findProperty('interlokJavadocs') ?: javadocsBaseUrl + "/interlok-core/" + interlokCoreVersion
   interlokCommonJavadocs= project.findProperty('interlokCommonJavadocs') ?: javadocsBaseUrl + "/interlok-common/" + interlokCoreVersion
+  interlokCatalogPlatform = "com.adaptris:interlok-version-catalog:${interlokCatalogVersion}"
   offlineJavadocPackageDir = new File(project.buildDir, "offline-javadoc-packages")
 
   delombokTargetDir = new File("${project.projectDir}/src/main/generated")
@@ -139,22 +141,30 @@ configurations.all {
 }
 
 dependencies {
-  api ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
-  api ("com.adaptris:interlok-common:$interlokCoreVersion") { changing= true}
-  implementation ("org.slf4j:slf4j-api:$slf4jVersion")
-  api ("org.apache.kafka:kafka-clients:$kafkaVersion")
+  api platform(interlokCatalogPlatform)
+  implementation platform(interlokCatalogPlatform)
+  compileOnly platform(interlokCatalogPlatform)
+  annotationProcessor platform(interlokCatalogPlatform)
+  testImplementation platform(interlokCatalogPlatform)
+  testCompileOnly platform(interlokCatalogPlatform)
+  testRuntimeOnly platform(interlokCatalogPlatform)
+
+  api ("com.adaptris:interlok-core") { changing= true}
+  api ("com.adaptris:interlok-common") { changing= true}
+  implementation ("org.slf4j:slf4j-api")
+  api ("org.apache.kafka:kafka-clients")
   constraints {
-    implementation ("at.yawk.lz4:lz4-java:1.11.4") {
+    implementation ("at.yawk.lz4:lz4-java") {
       because 'Fix native loading, bounds checking and decompression resource exhaustion vulnerabilities'
     }
-    implementation ("org.xerial.snappy:snappy-java:1.1.10.11") {
+    implementation ("org.xerial.snappy:snappy-java") {
       because 'Fix buffer overflow vulnerabilities in compression and decompression'
     }
-    implementation ("com.github.luben:zstd-jni:1.5.7-22") {
+    implementation ("com.github.luben:zstd-jni") {
       because 'Fix native bounds checking and decompression infinite loop vulnerabilities'
     }
   }
-  api ("org.apache.kafka:kafka_2.13:$kafkaVersion") {
+  api ("org.apache.kafka:kafka_2.13") {
     // 4.1.45.Final has a Uncontrolled Memory Allocation issue.
     // we exclude netty, and force the fixed version
     // dependabot will sort us out...
@@ -164,38 +174,40 @@ dependencies {
     // CVE-2024-29371 fixed in 0.9.6
     exclude group: "org.bitbucket.b_c"
   }
-  implementation("org.bitbucket.b_c:jose4j:0.9.6")
+  implementation("org.bitbucket.b_c:jose4j")
   // Dependency to platform/BOM
-  implementation (platform("com.fasterxml.jackson:jackson-bom:$jacksonVersion"))
+  implementation (platform("com.fasterxml.jackson:jackson-bom"))
   api ("com.fasterxml.jackson.core:jackson-databind")
-  api ("commons-collections:commons-collections:3.2.2")
-  api ("commons-beanutils:commons-beanutils:1.11.0")
-  implementation ("org.apache.zookeeper:zookeeper:$zookeeperVersion") {
+  api ("commons-collections:commons-collections")
+  api ("commons-beanutils:commons-beanutils")
+  implementation ("org.apache.zookeeper:zookeeper") {
     // CVE-2023-6378 on versions before 1.2.13
     exclude group: "ch.qos.logback"
   }
 
-  api ("ch.qos.logback:logback-classic:1.6.5")
+  api ("ch.qos.logback:logback-classic")
 
   // Minimal netty specification
-  implementation ("io.netty:netty-handler:$nettyVersion")
-  implementation ("io.netty:netty-transport-native-epoll:$nettyVersion")
-  implementation ("io.netty:netty-codec:$nettyVersion")
+  implementation ("io.netty:netty-handler")
+  implementation ("io.netty:netty-transport-native-epoll")
+  implementation ("io.netty:netty-codec")
 
-  annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") {changing= true}
+  annotationProcessor ("com.adaptris:interlok-core-apt") {changing= true}
   umlDoclet("nl.talsmasoftware:umldoclet:2.1.0")
 
-  testImplementation ("org.junit.jupiter:junit-jupiter-engine:5.13.4")
-    testImplementation ("org.junit.platform:junit-platform-launcher:1.13.3")
-  testImplementation ("org.slf4j:slf4j-simple:$slf4jVersion")
-  testImplementation ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true }
-  testImplementation ("org.mockito:mockito-core:$mockitoVersion")
-  testImplementation ("org.mockito:mockito-inline:$mockitoVersion")
+  testImplementation ("org.junit.jupiter:junit-jupiter-engine")
+  testImplementation ("org.junit.platform:junit-platform-launcher")
+  testImplementation ("org.slf4j:slf4j-simple")
+  testImplementation ("com.adaptris:interlok-stubs") { changing= true }
+  testImplementation ("org.mockito:mockito-core")
+  testImplementation ("org.mockito:mockito-inline")
 
-  testImplementation ("com.salesforce.kafka.test:kafka-junit5:3.2.5")
-  javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
-  offlineJavadocPackages ("com.adaptris:interlok-core:$interlokCoreVersion:javadoc@jar") { changing= true}
-  offlineJavadocPackages ("com.adaptris:interlok-common:$interlokCoreVersion:javadoc@jar") { changing= true}
+  testImplementation ("com.salesforce.kafka.test:kafka-junit5")
+  javadoc platform(interlokCatalogPlatform)
+  javadoc("com.adaptris:interlok-core-apt") { changing= true}
+  offlineJavadocPackages platform(interlokCatalogPlatform)
+  offlineJavadocPackages ("com.adaptris:interlok-core:javadoc@jar") { changing= true}
+  offlineJavadocPackages ("com.adaptris:interlok-common:javadoc@jar") { changing= true}
 }
 
 jar {
@@ -246,12 +258,20 @@ task offlinePackageList(type: Copy) {
 }
 
 javadoc {
+  dependsOn "offlinePackageList"
   onlyIf {
     !hasGraphViz()
   }
   configure(options) {
-    options.linksOffline(interlokJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-core-$interlokCoreVersion-javadoc.jar")
-    options.linksOffline(interlokCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-common-$interlokCoreVersion-javadoc.jar")
+    def coreJavadocDir = new File(offlineJavadocPackageDir, "interlok-core-${interlokCoreVersion}-javadoc.jar")
+    def commonJavadocDir = new File(offlineJavadocPackageDir, "interlok-common-${interlokCoreVersion}-javadoc.jar")
+
+    if (new File(coreJavadocDir, 'element-list').exists()) {
+        options.linksOffline(interlokJavadocs, coreJavadocDir.getCanonicalPath())
+    }
+    if (new File(commonJavadocDir, 'element-list').exists()) {
+        options.linksOffline(interlokCommonJavadocs, commonJavadocDir.getCanonicalPath())
+    }
     taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
     options.addStringOption "tagletpath", configurations.javadoc.asPath
     options.addStringOption "Xdoclint:none", "-quiet"
@@ -286,6 +306,7 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 }
 
 task umlJavadoc(type: Javadoc) {
+  dependsOn "offlinePackageList"
   group 'Documentation'
   description 'Build javadocs using plantuml + graphviz + umldoclet, if dot is available'
 
@@ -295,9 +316,15 @@ task umlJavadoc(type: Javadoc) {
   source = sourceSets.main.extensions.delombokTask
   classpath = project.sourceSets.main.compileClasspath
   configure(options) {
-    options.linksOffline(interlokJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-core-$interlokCoreVersion-javadoc.jar")
-    options.linksOffline(interlokCommonJavadocs, offlineJavadocPackageDir.getCanonicalPath() + "/interlok-common-$interlokCoreVersion-javadoc.jar")
+    def coreJavadocDir = new File(offlineJavadocPackageDir, "interlok-core-${interlokCoreVersion}-javadoc.jar")
+    def commonJavadocDir = new File(offlineJavadocPackageDir, "interlok-common-${interlokCoreVersion}-javadoc.jar")
 
+    if (new File(coreJavadocDir, 'element-list').exists()) {
+        options.linksOffline(interlokJavadocs, coreJavadocDir.getCanonicalPath())
+    }
+    if (new File(commonJavadocDir, 'element-list').exists()) {
+        options.linksOffline(interlokCommonJavadocs, commonJavadocDir.getCanonicalPath())
+    }
     taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
     options.addStringOption "tagletpath", configurations.javadoc.asPath
     options.addStringOption "Xdoclint:none", "-quiet"
