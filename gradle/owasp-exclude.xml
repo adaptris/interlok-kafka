@@ -1,38 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-<suppress>
-   <notes><![CDATA[
-   file name: netty-tcnative-classes-2.0.46.Final.jar
-   - appears to be false positive
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/io\.netty/netty\-tcnative\-classes@.*$</packageUrl>
-   <cve>CVE-2014-3488</cve>
-   <cve>CVE-2015-2156</cve>
-   <cve>CVE-2019-16869</cve>
-   <cve>CVE-2019-20444</cve>
-   <cve>CVE-2019-20445</cve>
-   <cve>CVE-2021-21290</cve>
-   <cve>CVE-2021-21295</cve>
-   <cve>CVE-2021-21409</cve>
-   <cve>CVE-2021-37136</cve>
-   <cve>CVE-2021-37137</cve>
-</suppress>
   <suppress>
     <notes><![CDATA[
-      file name: spring-boot-loader-2.7.18.jar
-      We are pinned to Spring Boot 2.7.x on Java 17. There is no newer 2.7.x release in Maven Central,
-      so these CVEs cannot be remediated by an in-line version bump at the moment.
+      CVE-2026-116593 affects Kafka Connect's connector-plugins configuration-validation REST endpoint.
+      The affected Connect endpoint is not included in kafka-clients; Dependency-Check's product-level
+      match against this client artifact is a false positive. See https://kafka.apache.org/community/cve-list/.
     ]]></notes>
-    <packageUrl regex="true">^pkg:maven/org\.springframework\.boot/spring-boot-loader@2\.7\.18$</packageUrl>
-    <cve>CVE-2026-40972</cve>
-    <cve>CVE-2026-40973</cve>
-    <cve>CVE-2026-40974</cve>
-    <cve>CVE-2026-40975</cve>
-    <cve>CVE-2026-40977</cve>
-  </suppress>  <suppress>
+    <packageUrl regex="true">^pkg:maven/org\.apache\.kafka/kafka-clients@3\.9\.2$</packageUrl>
+    <cve>CVE-2026-116593</cve>
+  </suppress>
+  <suppress>
     <notes><![CDATA[
-      Jetty 10.0.26 is the newest Jetty 10 release available in Maven Central. Remediation for this CVE
-      requires moving off the Jetty 10 line, which is outside the current Java 17 / Jetty 10 constraints.
+      Kafka fixes these issues only in 4.2.2, 4.3.2, and 4.4.0. The current shared Kafka 3.9 line
+      cannot be remediated without a major Kafka 4 upgrade, which is deferred to the separate
+      dependency-modernization effort. Revisit this suppression when that work is scheduled.
+      See https://kafka.apache.org/community/cve-list/.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.apache\.kafka/kafka-clients@3\.9\.2$</packageUrl>
+    <cve>CVE-2026-111115</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      Kafka fixes these issues only in 4.2.2, 4.3.2, and 4.4.0. The current shared Kafka 3.9 line
+      cannot be remediated without a major Kafka 4 upgrade, which is deferred to the separate
+      dependency-modernization effort. Revisit this suppression when that work is scheduled.
+      See https://kafka.apache.org/community/cve-list/.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.apache\.kafka/kafka_2\.13@3\.9\.2$</packageUrl>
+    <cve>CVE-2026-111115</cve>
+    <cve>CVE-2026-114349</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      Kafka fixes this issue only in 4.2.2, 4.3.2, and 4.4.0. The current shared Kafka 3.9 line
+      cannot be remediated without a major Kafka 4 upgrade, which is deferred to the separate
+      dependency-modernization effort. Revisit this suppression when that work is scheduled.
+      See https://kafka.apache.org/community/cve-list/.
+    ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.apache\.kafka/kafka\-raft@3\.9\.2$</packageUrl>
+    <cve>CVE-2026-83525</cve>
+  </suppress>
+  <suppress>
+    <notes><![CDATA[
+      Jetty 10.0.26 is the newest public 10.0.x artifact available in Maven Central, and the Jetty
+      project has no Jetty 10 patch for this issue. Remediation requires moving to a maintained Jetty
+      major version; defer that compatibility migration to the separate dependency-modernization effort.
+      See https://github.com/jetty/jetty.project/security/advisories/GHSA-355h-qmc2-wpwf.
     ]]></notes>
     <packageUrl regex="true">^pkg:maven/org\.eclipse\.jetty(\.http2|\.websocket)?/.+@10\.0\.26$</packageUrl>
     <cve>CVE-2026-2332</cve>
